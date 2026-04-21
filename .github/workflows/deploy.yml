@@ -1,0 +1,33 @@
+name: Auto Deploy to VPS
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Deploy via SSH
+        uses: appleboy/ssh-action@master
+        with:
+          host: ${{ secrets.VPS_HOST }}
+          username: ${{ secrets.VPS_USER }}
+          password: ${{ secrets.VPS_PASSWORD }}
+          # Si prefieres usar llave SSH en lugar de contraseña, comenta `password` y descomenta `key`:
+          # key: ${{ secrets.VPS_PRIVATE_KEY }}
+          port: ${{ secrets.VPS_PORT }} # Opcional, usualmente es 22 pero Hostinger a veces usa 22 o 6969
+          script: |
+            # Ir la nueva ubicacion provista para hostear el proyecto
+            cd /home/socioeducativo 
+            
+            # Traer los ultimos cambios de GitHub
+            git pull origin main
+            
+            # Detener contenedores actuales
+            docker compose down
+            
+            # Levantar contenedores reconstruyendo las imagenes (por si hubo cambios en Frontend/Backend)
+            docker compose up -d --build

@@ -1,0 +1,72 @@
+version: '3.8'
+
+services:
+  postgres:
+    image: postgres:15-alpine
+    container_name: socio_db
+    environment:
+      POSTGRES_DB: socioeducativo
+      POSTGRES_USER: socio_admin
+      POSTGRES_PASSWORD: ${DB_PASSWORD:-SecurePass123!}
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    ports:
+      - "5440:5432" # Changed to 5440 to avoid conflict with existing PostgreSQL instances
+    networks:
+      - socio_network
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U socio_admin -d socioeducativo"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  backend:
+    build: ./Backend
+    container_name: socio_backend
+    environment:
+      DATABASE_URL: postgresql://socio_admin:${DB_PASSWORD:-SecurePass123!}@postgres:5432/socioeducativo
+      JWT_SECRET: ${JWT_SECRET:-change-this-jwt-secret-in-production-64chars}
+      JWT_REFRESH_SECRET: ${JWT_REFRESH_SECRET:-change-this-refresh-secret-in-production}
+      NODE_ENV: production
+      PORT: 3001
+      CORS_ORIGIN: http://localhost
+    volumes:
+      - ./uploads:/app/uploads
+    depends_on:
+      postgres:
+        condition: service_healthy
+    networks:
+      - socio_network
+    restart: unless-stopped
+
+  frontend:
+    build: ./Frontend
+    container_name: socio_frontend
+    depends_on:
+      - backend
+    networks:
+      - socio_network
+    restart: unless-stopped
+
+  nginx:
+    image: nginx:alpine
+    container_name: socio_nginx
+    ports:
+      - "8094:80" # Exposed externally for NPM to point to
+    volumes:
+      - ./nginx/default.conf:/etc/nginx/conf.d/default.conf
+      - ./uploads:/var/www/uploads:ro
+    depends_on:
+      - backend
+      - frontend
+    networks:
+      - socio_network
+    restart: unless-stopped
+
+volumes:
+  postgres_data:
+
+networks:
+  socio_network:
+    driver: bridge

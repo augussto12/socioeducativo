@@ -1,0 +1,190 @@
+/* ─── Matches Tab Bar ─────────────────────────────── */
+.matches-tabs {
+  display: flex;
+  gap: 0;
+  border-bottom: 2px solid var(--border-color);
+  margin-bottom: 1.5rem;
+}
+
+.matches-tab {
+  padding: 0.75rem 1.5rem;
+  background: none;
+  border: none;
+  color: var(--text-muted);
+  font-family: var(--font-body);
+  font-size: 0.9rem;
+  font-weight: 600;
+  cursor: pointer;
+  position: relative;
+  transition: color var(--transition-fast);
+}
+
+.matches-tab:hover {
+  color: var(--text-primary);
+}
+
+.matches-tab.active {
+  color: var(--accent-primary);
+}
+
+.matches-tab.active::after {
+  content: '';
+  position: absolute;
+  bottom: -2px;
+  left: 0;
+  right: 0;
+  height: 2px;
+  background: var(--accent-primary);
+  border-radius: 2px 2px 0 0;
+}
+
+/* ─── Match Round ─────────────────────────────────── */
+.match-round {
+  margin-bottom: 2rem;
+}
+
+.match-round-title {
+  font-size: 0.85rem;
+  font-weight: 700;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  margin-bottom: 0.75rem;
+  padding-left: 0.5rem;
+  border-left: 3px solid var(--accent-primary);
+}
+
+.match-round-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+/* ─── Match Card Admin ────────────────────────────── */
+.match-card-admin {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0.875rem 1.25rem;
+  background: var(--bg-card);
+  border: 1px solid var(--border-light);
+  border-radius: var(--radius-md);
+  transition: all var(--transition-fast);
+}
+
+.match-card-admin:hover {
+  border-color: var(--border-accent);
+}
+
+.match-card-admin.played {
+  border-left: 3px solid var(--accent-success);
+}
+
+.match-card-admin.postponed {
+  opacity: 0.6;
+  border-left: 3px solid var(--accent-warning);
+}
+
+.match-card-teams {
+  display: flex;
+  align-items: center;
+  gap: 1.5rem;
+  flex: 1;
+}
+
+.match-card-team {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  min-width: 140px;
+}
+
+.match-card-team:last-child {
+  justify-content: flex-end;
+}
+
+.match-team-name {
+  font-size: 0.9rem;
+  font-weight: 600;
+}
+
+.match-card-score {
+  text-align: center;
+  min-width: 80px;
+}
+
+.match-card-actions {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin-left: 1rem;
+}
+
+/* ─── Result Form ─────────────────────────────────── */
+.result-form {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 1.5rem;
+  padding: 1.5rem 0;
+}
+
+.result-team {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 0.9rem;
+  font-weight: 600;
+  text-align: center;
+  min-width: 100px;
+}
+
+.result-scores {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.result-score-input {
+  width: 70px;
+  height: 70px;
+  text-align: center;
+  font-family: var(--font-mono);
+  font-size: 2rem;
+  font-weight: 700;
+  background: var(--bg-input);
+  border: 2px solid var(--border-color);
+  border-radius: var(--radius-lg);
+  color: var(--text-primary);
+  outline: none;
+  transition: border-color var(--transition-fast);
+}
+
+.result-score-input:focus {
+  border-color: var(--accent-primary);
+  box-shadow: 0 0 0 3px rgba(99,102,241,0.15);
+}
+
+/* Remove spinner for number input */
+.result-score-input::-webkit-outer-spin-button,
+.result-score-input::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+
+@media (max-width: 768px) {
+  .match-card-admin {
+    flex-direction: column;
+    gap: 0.75rem;
+    align-items: stretch;
+  }
+  .match-card-teams {
+    flex-direction: column;
+    gap: 0.5rem;
+  }
+  .match-card-team { min-width: auto; justify-content: center !important; }
+  .match-card-actions { justify-content: center; margin-left: 0; }
+  .result-form { flex-direction: column; }
+  .result-score-input { width: 60px; height: 60px; font-size: 1.5rem; }
+}

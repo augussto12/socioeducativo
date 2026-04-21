@@ -1,0 +1,152 @@
+.team-layout {
+  min-height: 100vh;
+  background: linear-gradient(145deg, #0f0c29 0%, #1a1040 30%, #24243e 60%, #0f0c29 100%);
+  position: relative;
+  overflow-x: hidden;
+}
+
+/* Subtle animated background pattern */
+.team-layout::before {
+  content: '';
+  position: fixed;
+  inset: 0;
+  background: 
+    radial-gradient(circle at 15% 20%, rgba(139, 92, 246, 0.08) 0%, transparent 40%),
+    radial-gradient(circle at 85% 80%, rgba(6, 182, 212, 0.08) 0%, transparent 40%),
+    radial-gradient(circle at 50% 50%, rgba(236, 72, 153, 0.05) 0%, transparent 50%);
+  pointer-events: none;
+  z-index: 0;
+}
+
+/* ─── Top Bar ─────────────────────────────────────── */
+.team-topbar {
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  background: linear-gradient(135deg, rgba(99, 102, 241, 0.15), rgba(139, 92, 246, 0.1), rgba(6, 182, 212, 0.08));
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border-bottom: 2px solid rgba(139, 92, 246, 0.2);
+  box-shadow: 0 4px 30px rgba(139, 92, 246, 0.1);
+}
+
+.team-topbar-inner {
+  max-width: 1100px;
+  margin: 0 auto;
+  padding: 0.6rem 1.5rem;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.team-topbar-brand {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+}
+
+.team-topbar-emoji {
+  font-size: 2rem;
+  animation: bounceEmoji 2s ease-in-out infinite;
+}
+
+@keyframes bounceEmoji {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-4px); }
+}
+
+.team-topbar-title {
+  font-family: var(--font-display);
+  font-weight: 900;
+  font-size: 1.3rem;
+  background: linear-gradient(135deg, #a78bfa, #38bdf8, #34d399);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  display: block;
+  line-height: 1.1;
+}
+
+.team-topbar-sub {
+  font-size: 0.6rem;
+  text-transform: uppercase;
+  letter-spacing: 0.2em;
+  color: rgba(167, 139, 250, 0.6);
+  font-weight: 700;
+}
+
+.team-topbar-right {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.team-topbar-avatar {
+  width: 40px;
+  height: 40px;
+  border-radius: 14px;
+  background: linear-gradient(135deg, #8b5cf6, #ec4899);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: var(--font-display);
+  font-weight: 900;
+  font-size: 0.85rem;
+  color: white;
+  box-shadow: 0 4px 15px rgba(139, 92, 246, 0.4);
+  border: 2px solid rgba(255,255,255,0.15);
+}
+
+.team-topbar-name {
+  font-weight: 700;
+  font-size: 0.9rem;
+  color: #e2d9f3;
+}
+
+.team-topbar-user {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 0.1rem;
+}
+
+.team-logout-btn {
+  background: none;
+  border: none;
+  color: rgba(167, 139, 250, 0.5);
+  font-size: 0.7rem;
+  font-family: var(--font-body);
+  cursor: pointer;
+  padding: 0;
+  transition: color 0.2s;
+}
+.team-logout-btn:hover {
+  color: #f472b6;
+}
+
+/* ─── Content ─────────────────────────────────────── */
+.team-content {
+  max-width: 1100px;
+  margin: 0 auto;
+  padding: 1.5rem;
+  position: relative;
+  z-index: 1;
+}
+
+/* ─── Footer ──────────────────────────────────────── */
+.team-footer {
+  text-align: center;
+  padding: 2rem 1rem;
+  font-size: 0.75rem;
+  color: rgba(167, 139, 250, 0.35);
+  position: relative;
+  z-index: 1;
+}
+
+@media (max-width: 768px) {
+  .team-topbar-inner { padding: 0.5rem 1rem; }
+  .team-topbar-title { font-size: 1.1rem; }
+  .team-topbar-emoji { font-size: 1.5rem; }
+  .team-content { padding: 1rem; }
+  .team-topbar-name { font-size: 0.8rem; }
+}
