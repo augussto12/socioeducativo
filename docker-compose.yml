@@ -53,7 +53,7 @@ services:
     image: nginx:alpine
     container_name: socio_nginx
     ports:
-      - "8094:80" # Exposed externally for NPM to point to
+      - "8094:80" # Exposed externally for testing (opcional)
     volumes:
       - ./nginx/default.conf:/etc/nginx/conf.d/default.conf
       - ./uploads:/var/www/uploads:ro
@@ -62,6 +62,7 @@ services:
       - frontend
     networks:
       - socio_network
+      - npm_network
     restart: unless-stopped
 
 volumes:
@@ -70,3 +71,6 @@ volumes:
 networks:
   socio_network:
     driver: bridge
+  npm_network:
+    external: true
+    name: nginx-proxy-manager_default
