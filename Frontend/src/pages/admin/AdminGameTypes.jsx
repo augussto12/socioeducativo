@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { getGameTypes, createGameType, updateGameType, deleteGameType } from '../../api/tournaments.api';
 import { useToast } from '../../hooks/useToast';
+import SkeletonLoader from '../../components/SkeletonLoader';
 import './AdminCrud.css';
 
 export default function AdminGameTypes() {
@@ -64,7 +65,7 @@ export default function AdminGameTypes() {
 
   const commonEmojis = ['🏓', '♟️', '🃏', '⚽', '🎯', '🎱', '🏀', '🎮', '🎲', '🎳', '🏐', '🎸'];
 
-  if (loading) return <div className="loading-page"><div className="spinner" /></div>;
+  if (loading) return <SkeletonLoader variant="full-page" />;
 
   return (
     <div className="admin-crud">
@@ -72,7 +73,7 @@ export default function AdminGameTypes() {
 
       <div className="page-header">
         <h1 className="page-title">🎮 Tipos de Juego</h1>
-        <button className="btn btn-primary" onClick={openCreate}>+ Nuevo Juego</button>
+        <button className="btn btn-primary" onClick={openCreate} aria-label="Crear nuevo tipo de juego">+ Nuevo Juego</button>
       </div>
 
       {gameTypes.length === 0 ? (
@@ -89,8 +90,8 @@ export default function AdminGameTypes() {
               <div className="game-type-name">{gt.name}</div>
               <div className="game-type-desc">{gt.description || 'Sin descripción'}</div>
               <div className="game-type-actions">
-                <button className="btn btn-ghost btn-sm" onClick={() => openEdit(gt)}>✏️ Editar</button>
-                <button className="btn btn-ghost btn-sm" onClick={() => handleDelete(gt)} style={{ color: 'var(--accent-danger)' }}>🗑️</button>
+                <button className="btn btn-ghost btn-sm" onClick={() => openEdit(gt)} aria-label={`Editar ${gt.name}`}>✏️ Editar</button>
+                <button className="btn btn-ghost btn-sm" onClick={() => handleDelete(gt)} style={{ color: 'var(--accent-danger)' }} aria-label={`Eliminar ${gt.name}`}>🗑️</button>
               </div>
             </div>
           ))}
@@ -102,7 +103,7 @@ export default function AdminGameTypes() {
           <div className="modal-content" onClick={(e) => e.stopPropagation()}>
             <div className="modal-header">
               <h2>{editing ? 'Editar Juego' : 'Nuevo Juego'}</h2>
-              <button className="modal-close" onClick={() => setShowModal(false)}>×</button>
+              <button className="modal-close" onClick={() => setShowModal(false)} aria-label="Cerrar">×</button>
             </div>
             <form onSubmit={handleSubmit}>
               <div className="form-group">

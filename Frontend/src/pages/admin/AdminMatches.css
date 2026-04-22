@@ -1,25 +1,35 @@
-/* ─── Matches Tab Bar ─────────────────────────────── */
+/* ═══════════════════════════════════════════════════════════════
+   AdminMatches — Mobile-first match management styles
+   ═══════════════════════════════════════════════════════════════ */
+
+/* ─── Tabs ────────────────────────────────────────────────── */
+
 .matches-tabs {
   display: flex;
   gap: 0;
   border-bottom: 2px solid var(--border-color);
-  margin-bottom: 1.5rem;
+  margin-bottom: var(--space-lg);
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
 }
 
 .matches-tab {
-  padding: 0.75rem 1.5rem;
+  padding: 0.75rem 1rem;
   background: none;
   border: none;
   color: var(--text-muted);
   font-family: var(--font-body);
-  font-size: 0.9rem;
+  font-size: var(--text-sm);
   font-weight: 600;
   cursor: pointer;
   position: relative;
   transition: color var(--transition-fast);
+  white-space: nowrap;
+  min-height: var(--touch-min);
+  touch-action: manipulation;
 }
 
-.matches-tab:hover {
+.matches-tab:active {
   color: var(--text-primary);
 }
 
@@ -38,42 +48,46 @@
   border-radius: 2px 2px 0 0;
 }
 
-/* ─── Match Round ─────────────────────────────────── */
+/* ─── Match Round ─────────────────────────────────────────── */
+
 .match-round {
-  margin-bottom: 2rem;
+  margin-bottom: var(--space-xl);
 }
 
 .match-round-title {
-  font-size: 0.85rem;
+  font-size: var(--text-xs);
   font-weight: 700;
   color: var(--text-muted);
   text-transform: uppercase;
   letter-spacing: 0.05em;
   margin-bottom: 0.75rem;
-  padding-left: 0.5rem;
+  padding-left: var(--space-sm);
   border-left: 3px solid var(--accent-primary);
 }
 
 .match-round-list {
   display: flex;
   flex-direction: column;
-  gap: 0.5rem;
+  gap: var(--space-sm);
 }
 
-/* ─── Match Card Admin ────────────────────────────── */
+/* ─── Match Card Admin — Mobile: stacked ──────────────────── */
+
 .match-card-admin {
   display: flex;
-  align-items: center;
-  justify-content: space-between;
-  padding: 0.875rem 1.25rem;
+  flex-direction: column;
+  gap: var(--space-sm);
+  padding: var(--space-md);
   background: var(--bg-card);
   border: 1px solid var(--border-light);
   border-radius: var(--radius-md);
   transition: all var(--transition-fast);
 }
 
-.match-card-admin:hover {
-  border-color: var(--border-accent);
+@media (hover: hover) {
+  .match-card-admin:hover {
+    border-color: var(--border-accent);
+  }
 }
 
 .match-card-admin.played {
@@ -88,56 +102,57 @@
 .match-card-teams {
   display: flex;
   align-items: center;
-  gap: 1.5rem;
-  flex: 1;
+  gap: var(--space-sm);
+  justify-content: center;
+  flex-wrap: wrap;
 }
 
 .match-card-team {
   display: flex;
   align-items: center;
-  gap: 0.5rem;
-  min-width: 140px;
-}
-
-.match-card-team:last-child {
-  justify-content: flex-end;
+  gap: var(--space-sm);
+  min-width: 0;
 }
 
 .match-team-name {
-  font-size: 0.9rem;
+  font-size: var(--text-sm);
   font-weight: 600;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
 .match-card-score {
   text-align: center;
-  min-width: 80px;
+  flex-shrink: 0;
 }
 
 .match-card-actions {
   display: flex;
   align-items: center;
-  gap: 0.5rem;
-  margin-left: 1rem;
+  justify-content: center;
+  gap: var(--space-sm);
+  flex-wrap: wrap;
 }
 
-/* ─── Result Form ─────────────────────────────────── */
+/* ─── Result Form ─────────────────────────────────────────── */
+
 .result-form {
   display: flex;
+  flex-direction: column;
   align-items: center;
-  justify-content: center;
-  gap: 1.5rem;
-  padding: 1.5rem 0;
+  gap: var(--space-md);
+  padding: var(--space-md) 0;
 }
 
 .result-team {
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 0.5rem;
-  font-size: 0.9rem;
+  gap: var(--space-sm);
+  font-size: var(--text-sm);
   font-weight: 600;
   text-align: center;
-  min-width: 100px;
 }
 
 .result-scores {
@@ -151,7 +166,7 @@
   height: 70px;
   text-align: center;
   font-family: var(--font-mono);
-  font-size: 2rem;
+  font-size: var(--text-3xl);
   font-weight: 700;
   background: var(--bg-input);
   border: 2px solid var(--border-color);
@@ -166,25 +181,53 @@
   box-shadow: 0 0 0 3px rgba(99,102,241,0.15);
 }
 
-/* Remove spinner for number input */
 .result-score-input::-webkit-outer-spin-button,
 .result-score-input::-webkit-inner-spin-button {
   -webkit-appearance: none;
   margin: 0;
 }
 
-@media (max-width: 768px) {
+/* ─── Desktop: horizontal layout ──────────────────────────── */
+
+@media (min-width: 768px) {
   .match-card-admin {
-    flex-direction: column;
-    gap: 0.75rem;
-    align-items: stretch;
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0.875rem var(--space-lg);
   }
+
   .match-card-teams {
-    flex-direction: column;
-    gap: 0.5rem;
+    flex: 1;
+    flex-wrap: nowrap;
+    gap: var(--space-lg);
   }
-  .match-card-team { min-width: auto; justify-content: center !important; }
-  .match-card-actions { justify-content: center; margin-left: 0; }
-  .result-form { flex-direction: column; }
-  .result-score-input { width: 60px; height: 60px; font-size: 1.5rem; }
+
+  .match-card-team {
+    min-width: 120px;
+  }
+
+  .match-card-team:last-child {
+    justify-content: flex-end;
+  }
+
+  .match-card-actions {
+    margin-left: var(--space-md);
+  }
+
+  .result-form {
+    flex-direction: row;
+    gap: var(--space-lg);
+    padding: var(--space-lg) 0;
+  }
+
+  .result-team {
+    min-width: 100px;
+  }
+}
+
+@media (min-width: 1024px) {
+  .match-card-team {
+    min-width: 160px;
+  }
 }

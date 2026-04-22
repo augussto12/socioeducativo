@@ -1,0 +1,80 @@
+/* TeamStandings — Positions page */
+
+.team-standings-page {
+  animation: fadeIn 0.4s ease;
+}
+
+.standings-page-header {
+  margin-bottom: var(--space-lg);
+}
+
+.standings-page-title {
+  font-family: var(--font-display);
+  font-size: var(--text-2xl);
+  font-weight: 900;
+  background: linear-gradient(135deg, #c4b5fd, #67e8f9);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  display: flex;
+  align-items: center;
+  gap: var(--space-sm);
+}
+
+.standings-tournaments-list {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-lg);
+}
+
+.standings-tournament-card {
+  background: linear-gradient(135deg, rgba(99, 102, 241, 0.06), rgba(6, 182, 212, 0.04));
+  border: 1.5px solid rgba(99, 102, 241, 0.15);
+  border-radius: var(--radius-xl);
+  padding: var(--space-md);
+  animation: slideUp 0.4s ease forwards;
+}
+
+.standings-tournament-header {
+  display: flex;
+  align-items: center;
+  gap: var(--space-sm);
+  margin-bottom: var(--space-md);
+  flex-wrap: wrap;
+}
+
+.standings-tournament-header span:first-child {
+  font-size: 1.5rem;
+}
+
+.standings-tournament-header h2 {
+  font-family: var(--font-display);
+  font-size: var(--text-lg);
+  font-weight: 800;
+  color: #e2d9f3;
+  flex: 1;
+  min-width: 0;
+}
+
+.team-error-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 50dvh;
+  gap: var(--space-md);
+  text-align: center;
+  color: var(--text-muted);
+}
+
+.refresh-area {
+  display: flex;
+  justify-content: center;
+  padding: var(--space-md) 0;
+}
+
+@media (min-width: 768px) {
+  .standings-tournament-card {
+    padding: var(--space-lg);
+  }
+}

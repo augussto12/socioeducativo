@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { getTournaments, createTournament, deleteTournament, enrollTeams, generateFixture, confirmFixture, getGameTypes } from '../../api/tournaments.api';
 import { getTeams } from '../../api/teams.api';
 import { useToast } from '../../hooks/useToast';
+import SkeletonLoader from '../../components/SkeletonLoader';
 import './AdminCrud.css';
 
 export default function AdminTournaments() {
@@ -98,7 +99,7 @@ export default function AdminTournaments() {
   const statusClass = { DRAFT: 'badge-pending', INSCRIPTIONS_OPEN: 'badge-draw', IN_PROGRESS: 'badge-active', FINISHED: 'badge-win', CANCELLED: 'badge-loss' };
   const formatLabel = { ROUND_ROBIN: 'Todos vs Todos', SINGLE_ELIMINATION: 'Eliminación Directa' };
 
-  if (loading) return <div className="loading-page"><div className="spinner" /></div>;
+  if (loading) return <SkeletonLoader variant="full-page" />;
 
   // Group fixture preview by round
   const fixtureRounds = fixturePreview?.fixtures?.reduce((acc, match) => {
@@ -114,7 +115,7 @@ export default function AdminTournaments() {
 
       <div className="page-header">
         <h1 className="page-title">🏆 Torneos</h1>
-        <button className="btn btn-primary" onClick={() => setShowModal(true)}>+ Nuevo Torneo</button>
+        <button className="btn btn-primary" onClick={() => setShowModal(true)} aria-label="Crear nuevo torneo">+ Nuevo Torneo</button>
       </div>
 
       {tournaments.length === 0 ? (
@@ -147,15 +148,15 @@ export default function AdminTournaments() {
                   <td>
                     <div className="flex-gap" style={{ flexWrap: 'wrap' }}>
                       {['DRAFT', 'INSCRIPTIONS_OPEN'].includes(t.status) && (
-                        <button className="btn btn-ghost btn-sm" onClick={() => { setShowEnroll(t); setSelectedTeams([]); }}>👥 Inscribir</button>
+                        <button className="btn btn-ghost btn-sm" onClick={() => { setShowEnroll(t); setSelectedTeams([]); }} aria-label={`Inscribir equipos en ${t.name}`}>👥 Inscribir</button>
                       )}
                       {['DRAFT', 'INSCRIPTIONS_OPEN'].includes(t.status) && t._count?.tournamentTeams >= 2 && (
-                        <button className="btn btn-success btn-sm" onClick={() => handleGenerateFixture(t)}>⚡ Generar Fixture</button>
+                        <button className="btn btn-success btn-sm" onClick={() => handleGenerateFixture(t)} aria-label={`Generar fixture de ${t.name}`}>⚡ Generar Fixture</button>
                       )}
                       {t.status === 'IN_PROGRESS' && (
-                        <button className="btn btn-primary btn-sm" onClick={() => navigate(`/admin/tournaments/${t.id}`)}>📋 Partidos</button>
+                        <button className="btn btn-primary btn-sm" onClick={() => navigate(`/admin/tournaments/${t.id}`)} aria-label={`Ver partidos de ${t.name}`}>📋 Partidos</button>
                       )}
-                      <button className="btn btn-ghost btn-sm" onClick={() => handleDelete(t)} style={{ color: 'var(--accent-danger)' }}>🗑️</button>
+                      <button className="btn btn-ghost btn-sm" onClick={() => handleDelete(t)} style={{ color: 'var(--accent-danger)' }} aria-label={`Eliminar ${t.name}`}>🗑️</button>
                     </div>
                   </td>
                 </tr>
@@ -171,7 +172,7 @@ export default function AdminTournaments() {
           <div className="modal-content" onClick={(e) => e.stopPropagation()} style={{ maxWidth: '640px' }}>
             <div className="modal-header">
               <h2>Nuevo Torneo</h2>
-              <button className="modal-close" onClick={() => setShowModal(false)}>×</button>
+              <button className="modal-close" onClick={() => setShowModal(false)} aria-label="Cerrar">×</button>
             </div>
             <form onSubmit={handleCreate}>
               <div className="form-group">
@@ -241,7 +242,7 @@ export default function AdminTournaments() {
           <div className="modal-content" onClick={(e) => e.stopPropagation()}>
             <div className="modal-header">
               <h2>Inscribir Equipos — {showEnroll.name}</h2>
-              <button className="modal-close" onClick={() => setShowEnroll(null)}>×</button>
+              <button className="modal-close" onClick={() => setShowEnroll(null)} aria-label="Cerrar">×</button>
             </div>
             <p style={{ color: 'var(--text-muted)', fontSize: '0.85rem', marginBottom: '1rem' }}>
               Seleccioná los equipos a inscribir
@@ -269,7 +270,7 @@ export default function AdminTournaments() {
           <div className="modal-content" onClick={(e) => e.stopPropagation()} style={{ maxWidth: '700px', maxHeight: '80vh', overflowY: 'auto' }}>
             <div className="modal-header">
               <h2>Preview del Fixture — {showFixture.name}</h2>
-              <button className="modal-close" onClick={() => { setShowFixture(null); setFixturePreview(null); }}>×</button>
+              <button className="modal-close" onClick={() => { setShowFixture(null); setFixturePreview(null); }} aria-label="Cerrar">×</button>
             </div>
             <div className="fixture-preview">
               {Object.entries(fixtureRounds).map(([round, matches]) => (

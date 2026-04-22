@@ -1,8 +1,10 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { getTournament, getStandings } from '../../api/tournaments.api';
 import { getMatchesByTournament, recordResult, editResult, changeMatchStatus } from '../../api/matches.api';
 import { useToast } from '../../hooks/useToast';
+import StandingsTable from '../../components/StandingsTable';
+import SkeletonLoader from '../../components/SkeletonLoader';
 import './AdminCrud.css';
 import './AdminMatches.css';
 
@@ -19,7 +21,7 @@ export default function AdminMatches() {
   const [activeTab, setActiveTab] = useState('matches');
   const toast = useToast();
 
-  const load = async () => {
+  const load = useCallback(async () => {
     try {
       const [tRes, mRes, sRes] = await Promise.all([
         getTournament(id),
@@ -29,16 +31,16 @@ export default function AdminMatches() {
       setTournament(tRes.data);
       setMatches(mRes.data.matches);
       setStandings(sRes.data);
-    } catch (err) {
+    } catch {
       toast.error('Error cargando datos');
     } finally {
       setLoading(false);
     }
-  };
+  }, [id, toast]);
 
-  useEffect(() => { load(); }, [id]);
+  useEffect(() => { load(); }, [load]);
 
-  const handleRecordResult = async () => {
+  const handleRecordResult = useCallback(async () => {
     setSaving(true);
     try {
       const match = showResult;
@@ -56,37 +58,36 @@ export default function AdminMatches() {
     } finally {
       setSaving(false);
     }
-  };
+  }, [showResult, resultForm, load, toast]);
 
-  const handlePostpone = async (match) => {
+  const handlePostpone = useCallback(async (match) => {
     if (!confirm('¿Postergar este partido?')) return;
     try {
       await changeMatchStatus(match.id, 'POSTPONED');
       toast.success('Partido postergado');
       load();
     } catch (err) { toast.error(err.response?.data?.error || 'Error'); }
-  };
+  }, [load, toast]);
 
-  const handleReactivate = async (match) => {
+  const handleReactivate = useCallback(async (match) => {
     try {
       await changeMatchStatus(match.id, 'PENDING');
       toast.success('Partido reactivado');
       load();
     } catch (err) { toast.error(err.response?.data?.error || 'Error'); }
-  };
+  }, [load, toast]);
 
-  const openResultModal = (match) => {
+  const openResultModal = useCallback((match) => {
     setResultForm({
       homeScore: match.result?.homeScore || 0,
       awayScore: match.result?.awayScore || 0,
     });
     setShowResult(match);
-  };
+  }, []);
 
-  if (loading) return <div className="loading-page"><div className="spinner" /></div>;
+  if (loading) return <SkeletonLoader variant="full-page" />;
   if (!tournament) return <div className="empty-state"><h3>Torneo no encontrado</h3></div>;
 
-  // Group matches by round
   const matchesByRound = matches.reduce((acc, m) => {
     const r = m.round;
     if (!acc[r]) acc[r] = [];
@@ -95,36 +96,48 @@ export default function AdminMatches() {
   }, {});
 
   return (
-    <div className="admin-crud admin-matches">
+    <section className="admin-crud admin-matches" aria-label="Gestión de partidos">
       <toast.ToastContainer />
 
       <div className="page-header">
         <div>
-          <button className="btn btn-ghost btn-sm" onClick={() => navigate('/admin/tournaments')} style={{ marginBottom: '0.5rem' }}>
+          <button className="btn btn-ghost btn-sm" onClick={() => navigate('/admin/tournaments')} aria-label="Volver a torneos">
             ← Volver a Torneos
           </button>
-          <h1 className="page-title">{tournament.gameType?.icon} {tournament.name}</h1>
-          <p style={{ color: 'var(--text-muted)', fontSize: '0.85rem' }}>
+          <h1 className="page-title">
+            <span aria-hidden="true">{tournament.gameType?.icon}</span> {tournament.name}
+          </h1>
+          <p style={{ color: 'var(--text-muted)', fontSize: 'var(--text-sm)' }}>
             {tournament.gameType?.name} · {tournament.format === 'ROUND_ROBIN' ? 'Todos vs Todos' : 'Eliminación Directa'}
           </p>
         </div>
       </div>
 
       {/* Tabs */}
-      <div className="matches-tabs">
-        <button className={`matches-tab ${activeTab === 'matches' ? 'active' : ''}`} onClick={() => setActiveTab('matches')}>
-          📋 Partidos ({matches.length})
+      <div className="matches-tabs" role="tablist">
+        <button
+          className={`matches-tab ${activeTab === 'matches' ? 'active' : ''}`}
+          onClick={() => setActiveTab('matches')}
+          role="tab"
+          aria-selected={activeTab === 'matches'}
+        >
+          <span aria-hidden="true">📋</span> Partidos ({matches.length})
         </button>
         {tournament.format === 'ROUND_ROBIN' && (
-          <button className={`matches-tab ${activeTab === 'standings' ? 'active' : ''}`} onClick={() => setActiveTab('standings')}>
-            📊 Tabla de Posiciones
+          <button
+            className={`matches-tab ${activeTab === 'standings' ? 'active' : ''}`}
+            onClick={() => setActiveTab('standings')}
+            role="tab"
+            aria-selected={activeTab === 'standings'}
+          >
+            <span aria-hidden="true">📊</span> Posiciones
           </button>
         )}
       </div>
 
       {/* Matches Tab */}
       {activeTab === 'matches' && (
-        <div className="matches-content">
+        <div className="matches-content" role="tabpanel">
           {Object.entries(matchesByRound).map(([round, roundMatches]) => (
             <div key={round} className="match-round">
               <h3 className="match-round-title">Fecha {round}</h3>
@@ -134,9 +147,16 @@ export default function AdminMatches() {
                     <div className="match-card-teams">
                       <div className="match-card-team">
                         {match.homeTeam?.shieldUrl ? (
-                          <img src={match.homeTeam.shieldUrl.startsWith('http') ? match.homeTeam.shieldUrl : `http://localhost:3001${match.homeTeam.shieldUrl}`} className="team-shield" alt="" />
+                          <img
+                            src={match.homeTeam.shieldUrl.startsWith('http') ? match.homeTeam.shieldUrl : `${window.location.origin}${match.homeTeam.shieldUrl}`}
+                            className="team-shield"
+                            alt=""
+                            loading="lazy"
+                            width="40"
+                            height="40"
+                          />
                         ) : (
-                          <div className="team-shield-placeholder">{match.homeTeam?.name?.substring(0, 2)}</div>
+                          <div className="team-shield-placeholder" aria-hidden="true">{match.homeTeam?.name?.substring(0, 2)}</div>
                         )}
                         <span className="match-team-name">{match.homeTeam?.name || 'TBD'}</span>
                       </div>
@@ -144,37 +164,48 @@ export default function AdminMatches() {
                       <div className="match-card-score">
                         {match.result ? (
                           <span className="score-display">
-                            {match.result.homeScore} <span className="score-vs">-</span> {match.result.awayScore}
+                            {match.result.homeScore} <span className="score-vs" aria-hidden="true">-</span> {match.result.awayScore}
                           </span>
                         ) : (
-                          <span className="score-vs" style={{ fontSize: '0.9rem' }}>VS</span>
+                          <span className="score-vs" aria-hidden="true">VS</span>
                         )}
                       </div>
 
                       <div className="match-card-team">
                         <span className="match-team-name">{match.awayTeam?.name || 'TBD'}</span>
                         {match.awayTeam?.shieldUrl ? (
-                          <img src={match.awayTeam.shieldUrl.startsWith('http') ? match.awayTeam.shieldUrl : `http://localhost:3001${match.awayTeam.shieldUrl}`} className="team-shield" alt="" />
+                          <img
+                            src={match.awayTeam.shieldUrl.startsWith('http') ? match.awayTeam.shieldUrl : `${window.location.origin}${match.awayTeam.shieldUrl}`}
+                            className="team-shield"
+                            alt=""
+                            loading="lazy"
+                            width="40"
+                            height="40"
+                          />
                         ) : (
-                          <div className="team-shield-placeholder">{match.awayTeam?.name?.substring(0, 2)}</div>
+                          <div className="team-shield-placeholder" aria-hidden="true">{match.awayTeam?.name?.substring(0, 2)}</div>
                         )}
                       </div>
                     </div>
 
                     <div className="match-card-actions">
                       {match.status === 'POSTPONED' && (
-                        <span className="badge badge-draw" style={{ marginRight: '0.5rem' }}>Postergado</span>
+                        <span className="badge badge-draw">Postergado</span>
                       )}
                       {match.status !== 'POSTPONED' && (
-                        <button className="btn btn-primary btn-sm" onClick={() => openResultModal(match)}>
+                        <button className="btn btn-primary btn-sm" onClick={() => openResultModal(match)} aria-label={match.result ? 'Editar resultado' : 'Cargar resultado'}>
                           {match.result ? '✏️ Editar' : '📝 Resultado'}
                         </button>
                       )}
                       {match.status === 'PENDING' && (
-                        <button className="btn btn-ghost btn-sm" onClick={() => handlePostpone(match)}>⏸️</button>
+                        <button className="btn btn-ghost btn-sm" onClick={() => handlePostpone(match)} aria-label="Postergar partido">
+                          ⏸️
+                        </button>
                       )}
                       {match.status === 'POSTPONED' && (
-                        <button className="btn btn-ghost btn-sm" onClick={() => handleReactivate(match)}>▶️</button>
+                        <button className="btn btn-ghost btn-sm" onClick={() => handleReactivate(match)} aria-label="Reactivar partido">
+                          ▶️
+                        </button>
                       )}
                     </div>
                   </div>
@@ -187,76 +218,40 @@ export default function AdminMatches() {
 
       {/* Standings Tab */}
       {activeTab === 'standings' && (
-        <div className="table-wrapper" style={{ marginTop: '1rem' }}>
-          <table className="data-table">
-            <thead>
-              <tr>
-                <th>#</th>
-                <th>Equipo</th>
-                <th>PJ</th>
-                <th>PG</th>
-                <th>PE</th>
-                <th>PP</th>
-                <th>GF</th>
-                <th>GC</th>
-                <th>DIF</th>
-                <th>PTS</th>
-              </tr>
-            </thead>
-            <tbody>
-              {standings.map((s) => (
-                <tr key={s.id}>
-                  <td><strong>{s.position}</strong></td>
-                  <td>
-                    <div className="flex-gap">
-                      <div className="team-shield-placeholder" style={{ width: 28, height: 28, fontSize: '0.65rem' }}>
-                        {s.team?.name?.substring(0, 2)}
-                      </div>
-                      <strong>{s.team?.name}</strong>
-                    </div>
-                  </td>
-                  <td>{s.played}</td>
-                  <td style={{ color: 'var(--accent-success)' }}>{s.wins}</td>
-                  <td>{s.draws}</td>
-                  <td style={{ color: 'var(--accent-danger)' }}>{s.losses}</td>
-                  <td>{s.pointsFor}</td>
-                  <td>{s.pointsAgainst}</td>
-                  <td style={{ color: s.pointsDiff > 0 ? 'var(--accent-success)' : s.pointsDiff < 0 ? 'var(--accent-danger)' : 'var(--text-muted)' }}>
-                    {s.pointsDiff > 0 ? '+' : ''}{s.pointsDiff}
-                  </td>
-                  <td><strong style={{ fontSize: '1.1rem' }}>{s.totalPoints}</strong></td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
+        <div role="tabpanel">
+          <StandingsTable standings={standings} />
         </div>
       )}
 
       {/* Result Modal */}
       {showResult && (
         <div className="modal-overlay" onClick={() => setShowResult(null)}>
-          <div className="modal-content" onClick={(e) => e.stopPropagation()}>
+          <div className="modal-content" onClick={(e) => e.stopPropagation()} role="dialog" aria-label="Cargar resultado">
             <div className="modal-header">
               <h2>{showResult.result ? 'Editar Resultado' : 'Cargar Resultado'}</h2>
-              <button className="modal-close" onClick={() => setShowResult(null)}>×</button>
+              <button className="modal-close" onClick={() => setShowResult(null)} aria-label="Cerrar">×</button>
             </div>
 
             <div className="result-form">
               <div className="result-team">
-                <div className="team-shield-placeholder">{showResult.homeTeam?.name?.substring(0, 2)}</div>
+                <div className="team-shield-placeholder" aria-hidden="true">{showResult.homeTeam?.name?.substring(0, 2)}</div>
                 <span>{showResult.homeTeam?.name}</span>
               </div>
 
               <div className="result-scores">
+                <label className="sr-only" htmlFor="home-score">Puntos local</label>
                 <input
+                  id="home-score"
                   type="number"
                   className="result-score-input"
                   value={resultForm.homeScore}
                   onChange={(e) => setResultForm({ ...resultForm, homeScore: parseInt(e.target.value) || 0 })}
                   min={0}
                 />
-                <span className="score-vs" style={{ fontSize: '1.2rem' }}>—</span>
+                <span className="score-vs" aria-hidden="true">—</span>
+                <label className="sr-only" htmlFor="away-score">Puntos visitante</label>
                 <input
+                  id="away-score"
                   type="number"
                   className="result-score-input"
                   value={resultForm.awayScore}
@@ -266,24 +261,24 @@ export default function AdminMatches() {
               </div>
 
               <div className="result-team">
-                <div className="team-shield-placeholder">{showResult.awayTeam?.name?.substring(0, 2)}</div>
+                <div className="team-shield-placeholder" aria-hidden="true">{showResult.awayTeam?.name?.substring(0, 2)}</div>
                 <span>{showResult.awayTeam?.name}</span>
               </div>
             </div>
 
-            <p className="confirm-text" style={{ textAlign: 'center', marginTop: '1rem' }}>
+            <p className="confirm-text" style={{ textAlign: 'center' }}>
               ¿Estás seguro del resultado? Esta acción actualizará la tabla de posiciones.
             </p>
 
             <div className="modal-actions">
-              <button className="btn btn-ghost" onClick={() => setShowResult(null)}>Cancelar</button>
               <button className="btn btn-primary" onClick={handleRecordResult} disabled={saving}>
                 {saving ? 'Guardando...' : '✅ Confirmar Resultado'}
               </button>
+              <button className="btn btn-ghost" onClick={() => setShowResult(null)}>Cancelar</button>
             </div>
           </div>
         </div>
       )}
-    </div>
+    </section>
   );
 }

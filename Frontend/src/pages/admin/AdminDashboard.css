@@ -1,18 +1,22 @@
+/* ═══════════════════════════════════════════════════════════════
+   AdminDashboard — Mobile-first responsive dashboard
+   ═══════════════════════════════════════════════════════════════ */
+
 .admin-dashboard .stats-grid {
   display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: 1rem;
-  margin-bottom: 2rem;
+  grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+  gap: var(--space-md);
+  margin-bottom: var(--space-xl);
 }
 
 .dashboard-section {
-  margin-bottom: 2rem;
+  margin-bottom: var(--space-xl);
 }
 
 .section-title {
-  font-size: 1.1rem;
+  font-size: var(--text-lg);
   font-weight: 700;
-  margin-bottom: 1rem;
+  margin-bottom: var(--space-md);
   color: var(--text-secondary);
 }
 
@@ -25,42 +29,55 @@
 .tournaments-list {
   display: flex;
   flex-direction: column;
-  gap: 0.5rem;
+  gap: var(--space-sm);
 }
 
 .tournament-row {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 1rem 1.25rem;
+  padding: var(--space-md);
   cursor: pointer;
+  gap: var(--space-sm);
+  min-height: var(--touch-min);
+  touch-action: manipulation;
+}
+.tournament-row:active {
+  transform: scale(0.99);
 }
 
 .tournament-row-info {
   display: flex;
   align-items: center;
-  gap: 1rem;
+  gap: var(--space-md);
+  flex: 1;
+  min-width: 0;
 }
 
 .tournament-row-icon {
-  font-size: 1.75rem;
+  font-size: 1.5rem;
+  flex-shrink: 0;
 }
 
 .tournament-row-name {
   font-weight: 600;
-  font-size: 0.95rem;
+  font-size: var(--text-base);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
 .tournament-row-meta {
-  font-size: 0.8rem;
+  font-size: var(--text-xs);
   color: var(--text-muted);
-  margin-top: 0.15rem;
+  margin-top: 0.1rem;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
-@media (max-width: 1024px) {
-  .admin-dashboard .stats-grid { grid-template-columns: repeat(2, 1fr); }
-}
-
-@media (max-width: 768px) {
-  .admin-dashboard .stats-grid { grid-template-columns: 1fr; }
+@media (min-width: 768px) {
+  .tournament-row-icon {
+    font-size: 1.75rem;
+  }
 }

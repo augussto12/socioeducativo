@@ -1,0 +1,171 @@
+/* ═══════════════════════════════════════════════════════════════
+   StandingsTable — Responsive positions table
+   Mobile: horizontal scroll + sticky left columns
+   Desktop: full table
+   ═══════════════════════════════════════════════════════════════ */
+
+.standings-wrapper {
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+  border-radius: var(--radius-lg);
+  background: var(--bg-card);
+  border: 1px solid var(--border-light);
+  position: relative;
+}
+
+/* Scroll hint gradient */
+.standings-wrapper::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  width: 20px;
+  background: linear-gradient(to left, var(--bg-card), transparent);
+  pointer-events: none;
+  transition: opacity var(--transition-base);
+  z-index: 2;
+}
+.standings-wrapper.scrolled-end::after {
+  opacity: 0;
+}
+
+/* ─── Table ───────────────────────────────────────────────── */
+
+.standings-table {
+  width: 100%;
+  border-collapse: separate;
+  border-spacing: 0;
+  min-width: 420px;
+}
+
+.standings-table th {
+  padding: 0.6rem 0.65rem;
+  text-align: left;
+  font-size: var(--text-xs);
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--text-muted);
+  border-bottom: 1px solid var(--border-color);
+  background: var(--bg-secondary);
+  position: sticky;
+  top: 0;
+  z-index: 3;
+  white-space: nowrap;
+}
+
+.standings-table td {
+  padding: 0.55rem 0.65rem;
+  font-size: var(--text-sm);
+  border-bottom: 1px solid var(--border-light);
+  color: var(--text-secondary);
+  white-space: nowrap;
+}
+
+/* ─── Sticky Columns (mobile) ─────────────────────────────── */
+
+.sticky-col {
+  position: sticky;
+  z-index: 4;
+  background: inherit;
+}
+
+.col-pos {
+  left: 0;
+  min-width: 40px;
+  text-align: center;
+}
+
+.col-team {
+  left: 40px;
+  min-width: 120px;
+  max-width: 160px;
+}
+
+/* Background for sticky columns in header */
+.standings-table th.sticky-col {
+  background: var(--bg-secondary);
+  z-index: 5;
+}
+
+/* Background for sticky columns in body */
+.standings-table td.sticky-col {
+  background: var(--bg-card);
+}
+
+.standings-highlight td {
+  background: rgba(99, 102, 241, 0.1) !important;
+}
+
+.standings-highlight td.sticky-col {
+  background: rgba(99, 102, 241, 0.1) !important;
+}
+
+/* ─── Hover ───────────────────────────────────────────────── */
+@media (hover: hover) {
+  .standings-table tbody tr:hover td {
+    background: var(--bg-hover);
+  }
+  .standings-table tbody tr:hover td.sticky-col {
+    background: var(--bg-hover);
+  }
+}
+
+/* ─── Cell styles ─────────────────────────────────────────── */
+
+.position-badge {
+  font-size: 1rem;
+}
+
+.standings-team-name {
+  font-weight: 600;
+  font-size: var(--text-sm);
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.standings-team-name.is-us {
+  color: var(--accent-primary-hover);
+  font-weight: 800;
+}
+
+.us-tag {
+  font-size: var(--text-xs);
+  opacity: 0.7;
+}
+
+.td-wins { color: #34d399; }
+.td-losses { color: #fb7185; }
+.td-positive { color: #34d399; }
+.td-negative { color: #fb7185; }
+.td-points {
+  font-weight: 900;
+  color: var(--text-primary);
+  font-size: var(--text-base);
+}
+
+.col-pts {
+  text-align: center;
+}
+
+/* ─── Desktop: no need for sticky, more padding ──────────── */
+
+@media (min-width: 768px) {
+  .standings-table {
+    min-width: unset;
+  }
+  .standings-table th,
+  .standings-table td {
+    padding: 0.65rem 0.85rem;
+  }
+  .standings-wrapper::after {
+    display: none;
+  }
+  .sticky-col {
+    position: static;
+  }
+  .col-team {
+    max-width: unset;
+  }
+}

@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { getTeams, createTeam, deleteTeam, resetTeamPassword, toggleTeamActive } from '../../api/teams.api';
 import { useToast } from '../../hooks/useToast';
+import SkeletonLoader from '../../components/SkeletonLoader';
 import './AdminCrud.css';
 
 export default function AdminTeams() {
@@ -74,7 +75,7 @@ export default function AdminTeams() {
     }
   };
 
-  if (loading) return <div className="loading-page"><div className="spinner" /></div>;
+  if (loading) return <SkeletonLoader variant="full-page" />;
 
   return (
     <div className="admin-crud">
@@ -82,7 +83,7 @@ export default function AdminTeams() {
 
       <div className="page-header">
         <h1 className="page-title">🛡️ Equipos</h1>
-        <button className="btn btn-primary" onClick={() => setShowModal(true)}>
+        <button className="btn btn-primary" onClick={() => setShowModal(true)} aria-label="Crear nuevo equipo">
           + Nuevo Equipo
         </button>
       </div>
@@ -92,7 +93,7 @@ export default function AdminTeams() {
         <div className="credentials-banner animate-slide-up">
           <div className="credentials-header">
             <span>🔑 Credenciales generadas</span>
-            <button className="modal-close" onClick={() => setCredentials(null)}>×</button>
+            <button className="modal-close" onClick={() => setCredentials(null)} aria-label="Cerrar credenciales">×</button>
           </div>
           <div className="credentials-body">
             <div><strong>Usuario:</strong> <code>{credentials.username}</code></div>
@@ -127,9 +128,9 @@ export default function AdminTeams() {
                   <td>
                     <div className="flex-gap">
                       {team.shieldUrl ? (
-                        <img src={team.shieldUrl.startsWith('http') ? team.shieldUrl : `http://localhost:3001${team.shieldUrl}`} className="team-shield" alt="" />
+                        <img src={team.shieldUrl.startsWith('http') ? team.shieldUrl : `${window.location.origin}${team.shieldUrl}`} className="team-shield" alt="" loading="lazy" width="40" height="40" />
                       ) : (
-                        <div className="team-shield-placeholder">
+                        <div className="team-shield-placeholder" aria-hidden="true">
                           {team.name.substring(0, 2).toUpperCase()}
                         </div>
                       )}
@@ -145,13 +146,13 @@ export default function AdminTeams() {
                   </td>
                   <td>
                     <div className="flex-gap">
-                      <button className="btn btn-ghost btn-sm" onClick={() => handleResetPassword(team)} title="Resetear contraseña">
+                      <button className="btn btn-ghost btn-sm" onClick={() => handleResetPassword(team)} aria-label={`Resetear contraseña de ${team.name}`}>
                         🔑
                       </button>
-                      <button className="btn btn-ghost btn-sm" onClick={() => handleToggleActive(team)} title="Activar/Desactivar">
+                      <button className="btn btn-ghost btn-sm" onClick={() => handleToggleActive(team)} aria-label={`${team.user?.isActive ? 'Desactivar' : 'Activar'} ${team.name}`}>
                         {team.user?.isActive ? '🚫' : '✅'}
                       </button>
-                      <button className="btn btn-ghost btn-sm" onClick={() => handleDelete(team)} title="Eliminar" style={{ color: 'var(--accent-danger)' }}>
+                      <button className="btn btn-ghost btn-sm" onClick={() => handleDelete(team)} aria-label={`Eliminar ${team.name}`} style={{ color: 'var(--accent-danger)' }}>
                         🗑️
                       </button>
                     </div>
@@ -169,7 +170,7 @@ export default function AdminTeams() {
           <div className="modal-content" onClick={(e) => e.stopPropagation()}>
             <div className="modal-header">
               <h2>Nuevo Equipo</h2>
-              <button className="modal-close" onClick={() => setShowModal(false)}>×</button>
+              <button className="modal-close" onClick={() => setShowModal(false)} aria-label="Cerrar">×</button>
             </div>
             <form onSubmit={handleCreate}>
               <div className="form-group">
