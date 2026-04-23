@@ -1,10 +1,12 @@
 import { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { getTeams, createTeam, deleteTeam, resetTeamPassword, toggleTeamActive } from '../../api/teams.api';
 import { useToast } from '../../hooks/useToast';
 import SkeletonLoader from '../../components/SkeletonLoader';
 import './AdminCrud.css';
 
 export default function AdminTeams() {
+  const navigate = useNavigate();
   const [teams, setTeams] = useState([]);
   const [loading, setLoading] = useState(true);
   const [showModal, setShowModal] = useState(false);
@@ -133,7 +135,7 @@ export default function AdminTeams() {
                 </span>
               </div>
               <div className="mobile-card-footer">
-                <span className="mobile-card-meta">
+                <span className="mobile-card-meta" onClick={() => navigate(`/admin/teams/${team.id}/players`)} style={{ cursor: 'pointer', textDecoration: 'underline', textUnderlineOffset: '2px' }} role="link" tabIndex={0}>
                   👥 {team._count?.players || 0} jugadores
                 </span>
                 <div className="mobile-card-actions">

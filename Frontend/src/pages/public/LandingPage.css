@@ -141,6 +141,72 @@
   flex-wrap: wrap;
 }
 
+/* ─── Birthday Banner ─────────────────────────────────────── */
+
+.landing-birthday {
+  max-width: 1100px;
+  margin: 0 auto;
+  padding: 0 var(--space-md) var(--space-lg);
+}
+
+.birthday-banner {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-md);
+  padding: var(--space-md) var(--space-lg);
+  background: linear-gradient(135deg, rgba(251, 191, 36, 0.12), rgba(236, 72, 153, 0.1), rgba(139, 92, 246, 0.08));
+  border: 2px solid rgba(251, 191, 36, 0.25);
+  border-radius: var(--radius-xl);
+  animation: birthdayPulse 3s ease-in-out infinite;
+}
+
+@keyframes birthdayPulse {
+  0%, 100% { border-color: rgba(251, 191, 36, 0.25); }
+  50% { border-color: rgba(236, 72, 153, 0.35); }
+}
+
+.birthday-confetti {
+  font-size: 1.5rem;
+  animation: confettiSpin 2s ease-in-out infinite;
+  flex-shrink: 0;
+}
+
+@keyframes confettiSpin {
+  0%, 100% { transform: rotate(0deg) scale(1); }
+  25% { transform: rotate(10deg) scale(1.1); }
+  75% { transform: rotate(-10deg) scale(1.1); }
+}
+
+.birthday-content {
+  text-align: center;
+  min-width: 0;
+}
+
+.birthday-title {
+  display: block;
+  font-family: var(--font-display);
+  font-size: var(--text-sm);
+  font-weight: 900;
+  color: #fbbf24;
+  margin-bottom: 0.2rem;
+}
+
+.birthday-names {
+  font-size: var(--text-xs);
+  color: #e2d9f3;
+  line-height: 1.5;
+}
+
+.birthday-name {
+  font-weight: 700;
+}
+
+.birthday-team {
+  color: rgba(196, 181, 253, 0.4);
+  font-weight: 400;
+}
+
 /* ─── Stats Row ───────────────────────────────────────────── */
 
 .landing-stats {

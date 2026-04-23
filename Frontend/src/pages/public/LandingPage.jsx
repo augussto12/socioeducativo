@@ -8,6 +8,7 @@ import { useNavigate } from 'react-router-dom';
 import { getTournaments, getStandings, getGameTypes } from '../../api/tournaments.api';
 import { getTeams } from '../../api/teams.api';
 import { getMatchesByTournament } from '../../api/matches.api';
+import { getBirthdaysToday } from '../../api/players.api';
 import SkeletonLoader from '../../components/SkeletonLoader';
 import StandingsTable from '../../components/StandingsTable';
 import './LandingPage.css';
@@ -21,6 +22,7 @@ export default function LandingPage() {
   const [activeTournament, setActiveTournament] = useState(null);
   const [standings, setStandings] = useState([]);
   const [recentMatches, setRecentMatches] = useState([]);
+  const [birthdays, setBirthdays] = useState([]);
 
   const load = useCallback(async () => {
     try {
@@ -36,6 +38,9 @@ export default function LandingPage() {
       setTournaments(allTourneys);
       setTeams(allTeams);
       setGameTypes(gamesRes.data || []);
+
+      // Fetch today's birthdays
+      getBirthdaysToday().then(r => setBirthdays(r.data || [])).catch(() => {});
 
       // Find active tournament for standings + matches
       const active = allTourneys.find(t => t.status === 'IN_PROGRESS') || allTourneys[0];
@@ -111,6 +116,28 @@ export default function LandingPage() {
           </div>
         </div>
       </section>
+
+      {/* ─── Birthday Banner ─────────────────────────── */}
+      {birthdays.length > 0 && (
+        <section className="landing-birthday" aria-label="Cumpleaños del día">
+          <div className="birthday-banner">
+            <span className="birthday-confetti" aria-hidden="true">🎉</span>
+            <div className="birthday-content">
+              <strong className="birthday-title">🎂 ¡Feliz Cumpleaños!</strong>
+              <div className="birthday-names">
+                {birthdays.map((p, i) => (
+                  <span key={p.id} className="birthday-name">
+                    {p.nickname || p.firstName} {p.lastName}
+                    <span className="birthday-team"> ({p.team?.name})</span>
+                    {i < birthdays.length - 1 && ', '}
+                  </span>
+                ))}
+              </div>
+            </div>
+            <span className="birthday-confetti" aria-hidden="true">🎊</span>
+          </div>
+        </section>
+      )}
 
       {/* ─── Stats Row ───────────────────────────────── */}
       <section className="landing-stats" aria-label="Estadísticas generales">

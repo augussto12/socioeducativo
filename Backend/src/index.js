@@ -36,6 +36,7 @@ app.use('/uploads', express.static(path.join(__dirname, '..', 'uploads')));
 app.use('/api/auth', authRoutes);
 app.use('/api/teams', teamsRoutes);
 app.use('/api/teams/:teamId/players', playersRoutes);
+app.get('/api/players/birthdays', require('./controllers/players.controller').getBirthdaysToday);
 app.use('/api/game-types', gameTypesRoutes);
 app.use('/api/tournaments', tournamentsRoutes);
 app.use('/api/matches', matchesRoutes);

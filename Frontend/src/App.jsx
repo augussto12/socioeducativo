@@ -11,6 +11,7 @@ const TournamentDetailPage = lazy(() => import('./pages/public/TournamentDetailP
 const AdminLayout = lazy(() => import('./layouts/AdminLayout'));
 const AdminDashboard = lazy(() => import('./pages/admin/AdminDashboard'));
 const AdminTeams = lazy(() => import('./pages/admin/AdminTeams'));
+const AdminPlayers = lazy(() => import('./pages/admin/AdminPlayers'));
 const AdminGameTypes = lazy(() => import('./pages/admin/AdminGameTypes'));
 const AdminTournaments = lazy(() => import('./pages/admin/AdminTournaments'));
 const AdminMatches = lazy(() => import('./pages/admin/AdminMatches'));
@@ -73,6 +74,7 @@ export default function App() {
             }>
               <Route index element={<AdminDashboard />} />
               <Route path="teams" element={<AdminTeams />} />
+              <Route path="teams/:teamId/players" element={<AdminPlayers />} />
               <Route path="game-types" element={<AdminGameTypes />} />
               <Route path="tournaments" element={<AdminTournaments />} />
               <Route path="tournaments/:id" element={<AdminMatches />} />

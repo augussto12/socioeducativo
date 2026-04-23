@@ -4,6 +4,8 @@
 
 .admin-crud {
   animation: fadeIn 0.3s ease;
+  width: 100%;
+  min-width: 0;
 }
 
 /* ═══════════════════════════════════════════════════════════════
@@ -230,6 +232,11 @@
 }
 
 @media (min-width: 768px) {
+  .mobile-card-list {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(340px, 1fr));
+    gap: var(--space-md);
+  }
   .fixture-preview {
     padding: var(--space-lg);
   }
@@ -239,4 +246,22 @@
   .fixture-team {
     font-size: var(--text-sm);
   }
+}
+
+/* ─── Player Avatar ───────────────────────────────────────── */
+
+.player-avatar {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #8b5cf6, #ec4899);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: var(--font-display);
+  font-weight: 800;
+  font-size: 0.65rem;
+  color: white;
+  flex-shrink: 0;
+  text-transform: uppercase;
 }

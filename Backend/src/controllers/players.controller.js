@@ -14,19 +14,17 @@ const getByTeam = async (req, res, next) => {
 
 const create = async (req, res, next) => {
   try {
-    const { firstName, lastName, nickname, birthDate, position, notes } = req.body;
+    const { firstName, lastName, nickname, birthDate } = req.body;
 
     if (!firstName || !lastName) {
       return res.status(400).json({ error: 'Nombre y apellido son requeridos' });
     }
 
-    // Check team exists
     const team = await prisma.team.findUnique({ where: { id: req.params.teamId } });
     if (!team) {
       return res.status(404).json({ error: 'Equipo no encontrado' });
     }
 
-    // Check player limit (max 20)
     const count = await prisma.player.count({
       where: { teamId: req.params.teamId, isActive: true },
     });
@@ -41,8 +39,6 @@ const create = async (req, res, next) => {
         lastName: lastName.trim(),
         nickname: nickname?.trim() || null,
         birthDate: birthDate ? new Date(birthDate) : null,
-        position: position?.trim() || null,
-        notes: notes?.trim() || null,
       },
     });
 
@@ -54,7 +50,7 @@ const create = async (req, res, next) => {
 
 const update = async (req, res, next) => {
   try {
-    const { firstName, lastName, nickname, birthDate, position, notes } = req.body;
+    const { firstName, lastName, nickname, birthDate } = req.body;
 
     const player = await prisma.player.update({
       where: { id: req.params.id },
@@ -63,8 +59,6 @@ const update = async (req, res, next) => {
         ...(lastName && { lastName: lastName.trim() }),
         ...(nickname !== undefined && { nickname: nickname?.trim() || null }),
         ...(birthDate !== undefined && { birthDate: birthDate ? new Date(birthDate) : null }),
-        ...(position !== undefined && { position: position?.trim() || null }),
-        ...(notes !== undefined && { notes: notes?.trim() || null }),
       },
     });
 
@@ -86,4 +80,34 @@ const remove = async (req, res, next) => {
   }
 };
 
-module.exports = { getByTeam, create, update, remove };
+const getBirthdaysToday = async (req, res, next) => {
+  try {
+    const today = new Date();
+    const month = today.getMonth() + 1;
+    const day = today.getDate();
+
+    const players = await prisma.player.findMany({
+      where: {
+        isActive: true,
+        birthDate: { not: null },
+      },
+      include: {
+        team: { select: { id: true, name: true, shieldUrl: true } },
+      },
+      orderBy: { lastName: 'asc' },
+    });
+
+    // Filter by month/day match (Prisma doesn't support EXTRACT natively)
+    const birthdayPlayers = players.filter((p) => {
+      const bd = new Date(p.birthDate);
+      return bd.getMonth() + 1 === month && bd.getDate() === day;
+    });
+
+    res.json(birthdayPlayers);
+  } catch (error) {
+    next(error);
+  }
+};
+
+module.exports = { getByTeam, create, update, remove, getBirthdaysToday };
+
