@@ -1,33 +1,16 @@
 /* ═══════════════════════════════════════════════════════════════
-   StandingsTable — Responsive positions table
-   Mobile: horizontal scroll + sticky left columns
-   Desktop: full table
+   StandingsTable — ULTRA COMPACT mobile, full table on desktop
+   Mobile: ALL columns fit in screen, tiny text + tight padding
+   Desktop: full comfortable table
    ═══════════════════════════════════════════════════════════════ */
 
 .standings-wrapper {
-  overflow-x: auto;
-  -webkit-overflow-scrolling: touch;
   border-radius: var(--radius-lg);
   background: var(--bg-card);
   border: 1px solid var(--border-light);
   position: relative;
-}
-
-/* Scroll hint gradient */
-.standings-wrapper::after {
-  content: '';
-  position: absolute;
-  top: 0;
-  right: 0;
-  bottom: 0;
-  width: 20px;
-  background: linear-gradient(to left, var(--bg-card), transparent);
-  pointer-events: none;
-  transition: opacity var(--transition-base);
-  z-index: 2;
-}
-.standings-wrapper.scrolled-end::after {
-  opacity: 0;
+  /* NO overflow-x: auto — we want it to fit, not scroll */
+  overflow: hidden;
 }
 
 /* ─── Table ───────────────────────────────────────────────── */
@@ -36,93 +19,83 @@
   width: 100%;
   border-collapse: separate;
   border-spacing: 0;
-  min-width: 420px;
+  /* NO min-width — table must fit in screen */
+  table-layout: fixed;
 }
 
+/* ─── Mobile-first: ultra compact cells ───────────────────── */
+
 .standings-table th {
-  padding: 0.6rem 0.65rem;
-  text-align: left;
-  font-size: var(--text-xs);
+  padding: 0.35rem 0.2rem;
+  text-align: center;
+  font-size: 0.55rem;
   font-weight: 800;
   text-transform: uppercase;
-  letter-spacing: 0.08em;
+  letter-spacing: 0.02em;
   color: var(--text-muted);
   border-bottom: 1px solid var(--border-color);
   background: var(--bg-secondary);
-  position: sticky;
-  top: 0;
-  z-index: 3;
   white-space: nowrap;
+  overflow: hidden;
 }
 
 .standings-table td {
-  padding: 0.55rem 0.65rem;
-  font-size: var(--text-sm);
+  padding: 0.35rem 0.2rem;
+  font-size: 0.65rem;
   border-bottom: 1px solid var(--border-light);
   color: var(--text-secondary);
+  text-align: center;
   white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
-/* ─── Sticky Columns (mobile) ─────────────────────────────── */
-
-.sticky-col {
-  position: sticky;
-  z-index: 4;
-  background: inherit;
-}
+/* ─── Column sizing (mobile) ──────────────────────────────── */
 
 .col-pos {
-  left: 0;
-  min-width: 40px;
+  width: 24px;
   text-align: center;
 }
 
 .col-team {
-  left: 40px;
-  min-width: 120px;
-  max-width: 160px;
+  text-align: left !important;
+  width: auto; /* takes remaining space */
 }
 
-/* Background for sticky columns in header */
-.standings-table th.sticky-col {
-  background: var(--bg-secondary);
-  z-index: 5;
+.col-team .standings-team-name {
+  display: block;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  max-width: 100%;
 }
 
-/* Background for sticky columns in body */
-.standings-table td.sticky-col {
-  background: var(--bg-card);
+/* Data columns: equally tiny */
+.standings-table th:not(.col-pos):not(.col-team):not(.col-pts),
+.standings-table td:not(.col-pos):not(.col-team):not(.col-pts) {
+  width: 22px;
 }
+
+.col-pts {
+  width: 28px;
+}
+
+/* ─── Highlight ───────────────────────────────────────────── */
 
 .standings-highlight td {
   background: rgba(99, 102, 241, 0.1) !important;
 }
 
-.standings-highlight td.sticky-col {
-  background: rgba(99, 102, 241, 0.1) !important;
-}
-
-/* ─── Hover ───────────────────────────────────────────────── */
-@media (hover: hover) {
-  .standings-table tbody tr:hover td {
-    background: var(--bg-hover);
-  }
-  .standings-table tbody tr:hover td.sticky-col {
-    background: var(--bg-hover);
-  }
-}
-
 /* ─── Cell styles ─────────────────────────────────────────── */
 
 .position-badge {
-  font-size: 1rem;
+  font-size: 0.7rem;
+  line-height: 1;
 }
 
 .standings-team-name {
   font-weight: 600;
-  font-size: var(--text-sm);
-  overflow: hidden;
-  text-overflow: ellipsis;
+  font-size: 0.65rem;
 }
 
 .standings-team-name.is-us {
@@ -131,8 +104,7 @@
 }
 
 .us-tag {
-  font-size: var(--text-xs);
-  opacity: 0.7;
+  display: none; /* too small for mobile */
 }
 
 .td-wins { color: #34d399; }
@@ -142,30 +114,82 @@
 .td-points {
   font-weight: 900;
   color: var(--text-primary);
-  font-size: var(--text-base);
+  font-size: 0.7rem;
 }
 
-.col-pts {
-  text-align: center;
+/* ─── Hover (desktop only) ────────────────────────────────── */
+@media (hover: hover) {
+  .standings-table tbody tr:hover td {
+    background: var(--bg-hover);
+  }
 }
 
-/* ─── Desktop: no need for sticky, more padding ──────────── */
+/* ═══════════════════════════════════════════════════════════════
+   TABLET (≥480px) — Slightly larger
+   ═══════════════════════════════════════════════════════════════ */
+
+@media (min-width: 480px) {
+  .standings-table th {
+    padding: 0.4rem 0.3rem;
+    font-size: 0.6rem;
+  }
+  .standings-table td {
+    padding: 0.45rem 0.3rem;
+    font-size: 0.7rem;
+  }
+  .standings-team-name {
+    font-size: 0.72rem;
+  }
+  .position-badge {
+    font-size: 0.8rem;
+  }
+  .td-points {
+    font-size: 0.75rem;
+  }
+  .standings-table th:not(.col-pos):not(.col-team):not(.col-pts),
+  .standings-table td:not(.col-pos):not(.col-team):not(.col-pts) {
+    width: 28px;
+  }
+  .col-pos { width: 28px; }
+  .col-pts { width: 32px; }
+  .us-tag {
+    display: inline;
+    font-size: 0.55rem;
+    opacity: 0.7;
+  }
+}
+
+/* ═══════════════════════════════════════════════════════════════
+   DESKTOP (≥768px) — Comfortable full table
+   ═══════════════════════════════════════════════════════════════ */
 
 @media (min-width: 768px) {
   .standings-table {
-    min-width: unset;
+    table-layout: auto;
   }
-  .standings-table th,
-  .standings-table td {
+  .standings-table th {
     padding: 0.65rem 0.85rem;
+    font-size: var(--text-xs);
+    letter-spacing: 0.08em;
   }
-  .standings-wrapper::after {
-    display: none;
+  .standings-table td {
+    padding: 0.6rem 0.85rem;
+    font-size: var(--text-sm);
   }
-  .sticky-col {
-    position: static;
+  .standings-team-name {
+    font-size: var(--text-sm);
   }
-  .col-team {
-    max-width: unset;
+  .position-badge {
+    font-size: 1rem;
+  }
+  .td-points {
+    font-size: var(--text-base);
+  }
+  .col-pos { width: auto; }
+  .col-team { width: auto; }
+  .col-pts { width: auto; }
+  .standings-table th:not(.col-pos):not(.col-team):not(.col-pts),
+  .standings-table td:not(.col-pos):not(.col-team):not(.col-pts) {
+    width: auto;
   }
 }

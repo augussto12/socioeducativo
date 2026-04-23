@@ -125,44 +125,38 @@ export default function AdminTournaments() {
           <p>Creá tu primer torneo</p>
         </div>
       ) : (
-        <div className="table-wrapper">
-          <table className="data-table">
-            <thead>
-              <tr>
-                <th>Torneo</th>
-                <th>Juego</th>
-                <th>Formato</th>
-                <th>Equipos</th>
-                <th>Estado</th>
-                <th>Acciones</th>
-              </tr>
-            </thead>
-            <tbody>
-              {tournaments.map((t) => (
-                <tr key={t.id}>
-                  <td><strong>{t.name}</strong></td>
-                  <td>{t.gameType?.icon} {t.gameType?.name}</td>
-                  <td>{formatLabel[t.format]}</td>
-                  <td>{t._count?.tournamentTeams || 0}</td>
-                  <td><span className={`badge ${statusClass[t.status]}`}>{statusLabel[t.status]}</span></td>
-                  <td>
-                    <div className="flex-gap" style={{ flexWrap: 'wrap' }}>
-                      {['DRAFT', 'INSCRIPTIONS_OPEN'].includes(t.status) && (
-                        <button className="btn btn-ghost btn-sm" onClick={() => { setShowEnroll(t); setSelectedTeams([]); }} aria-label={`Inscribir equipos en ${t.name}`}>👥 Inscribir</button>
-                      )}
-                      {['DRAFT', 'INSCRIPTIONS_OPEN'].includes(t.status) && t._count?.tournamentTeams >= 2 && (
-                        <button className="btn btn-success btn-sm" onClick={() => handleGenerateFixture(t)} aria-label={`Generar fixture de ${t.name}`}>⚡ Generar Fixture</button>
-                      )}
-                      {t.status === 'IN_PROGRESS' && (
-                        <button className="btn btn-primary btn-sm" onClick={() => navigate(`/admin/tournaments/${t.id}`)} aria-label={`Ver partidos de ${t.name}`}>📋 Partidos</button>
-                      )}
-                      <button className="btn btn-ghost btn-sm" onClick={() => handleDelete(t)} style={{ color: 'var(--accent-danger)' }} aria-label={`Eliminar ${t.name}`}>🗑️</button>
-                    </div>
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
+        <div className="mobile-card-list">
+          {tournaments.map((t) => (
+            <div key={t.id} className="mobile-card">
+              <div className="mobile-card-main">
+                <div className="mobile-card-identity">
+                  <span className="mobile-card-icon" aria-hidden="true">{t.gameType?.icon || '🎮'}</span>
+                  <div className="mobile-card-name-block">
+                    <strong className="mobile-card-name">{t.name}</strong>
+                    <span className="mobile-card-subtitle">{t.gameType?.name} · {formatLabel[t.format]}</span>
+                  </div>
+                </div>
+                <span className={`badge ${statusClass[t.status]}`}>{statusLabel[t.status]}</span>
+              </div>
+              <div className="mobile-card-footer">
+                <span className="mobile-card-meta">
+                  🛡️ {t._count?.tournamentTeams || 0} equipos
+                </span>
+                <div className="mobile-card-actions">
+                  {['DRAFT', 'INSCRIPTIONS_OPEN'].includes(t.status) && (
+                    <button className="btn btn-ghost btn-sm" onClick={() => { setShowEnroll(t); setSelectedTeams([]); }} aria-label={`Inscribir equipos en ${t.name}`}>👥</button>
+                  )}
+                  {['DRAFT', 'INSCRIPTIONS_OPEN'].includes(t.status) && t._count?.tournamentTeams >= 2 && (
+                    <button className="btn btn-success btn-sm" onClick={() => handleGenerateFixture(t)} aria-label={`Generar fixture de ${t.name}`}>⚡</button>
+                  )}
+                  {t.status === 'IN_PROGRESS' && (
+                    <button className="btn btn-primary btn-sm" onClick={() => navigate(`/admin/tournaments/${t.id}`)} aria-label={`Ver partidos de ${t.name}`}>📋</button>
+                  )}
+                  <button className="btn btn-ghost btn-sm" onClick={() => handleDelete(t)} style={{ color: 'var(--accent-danger)' }} aria-label={`Eliminar ${t.name}`}>🗑️</button>
+                </div>
+              </div>
+            </div>
+          ))}
         </div>
       )}
 

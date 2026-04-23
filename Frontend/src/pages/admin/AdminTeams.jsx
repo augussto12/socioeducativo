@@ -111,56 +111,45 @@ export default function AdminTeams() {
           <p>Creá el primer equipo con el botón de arriba</p>
         </div>
       ) : (
-        <div className="table-wrapper">
-          <table className="data-table">
-            <thead>
-              <tr>
-                <th>Equipo</th>
-                <th>Usuario</th>
-                <th>Jugadores</th>
-                <th>Estado</th>
-                <th>Acciones</th>
-              </tr>
-            </thead>
-            <tbody>
-              {teams.map((team) => (
-                <tr key={team.id}>
-                  <td>
-                    <div className="flex-gap">
-                      {team.shieldUrl ? (
-                        <img src={team.shieldUrl.startsWith('http') ? team.shieldUrl : `${window.location.origin}${team.shieldUrl}`} className="team-shield" alt="" loading="lazy" width="40" height="40" />
-                      ) : (
-                        <div className="team-shield-placeholder" aria-hidden="true">
-                          {team.name.substring(0, 2).toUpperCase()}
-                        </div>
-                      )}
-                      <strong>{team.name}</strong>
+        <div className="mobile-card-list">
+          {teams.map((team) => (
+            <div key={team.id} className="mobile-card">
+              <div className="mobile-card-main">
+                <div className="mobile-card-identity">
+                  {team.shieldUrl ? (
+                    <img src={team.shieldUrl.startsWith('http') ? team.shieldUrl : `${window.location.origin}${team.shieldUrl}`} className="team-shield" alt="" loading="lazy" width="40" height="40" />
+                  ) : (
+                    <div className="team-shield-placeholder" aria-hidden="true">
+                      {team.name.substring(0, 2).toUpperCase()}
                     </div>
-                  </td>
-                  <td><code style={{ fontSize: '0.8rem' }}>{team.user?.username || '—'}</code></td>
-                  <td>{team._count?.players || 0}</td>
-                  <td>
-                    <span className={`badge ${team.user?.isActive ? 'badge-active' : 'badge-inactive'}`}>
-                      {team.user?.isActive ? 'Activo' : 'Inactivo'}
-                    </span>
-                  </td>
-                  <td>
-                    <div className="flex-gap">
-                      <button className="btn btn-ghost btn-sm" onClick={() => handleResetPassword(team)} aria-label={`Resetear contraseña de ${team.name}`}>
-                        🔑
-                      </button>
-                      <button className="btn btn-ghost btn-sm" onClick={() => handleToggleActive(team)} aria-label={`${team.user?.isActive ? 'Desactivar' : 'Activar'} ${team.name}`}>
-                        {team.user?.isActive ? '🚫' : '✅'}
-                      </button>
-                      <button className="btn btn-ghost btn-sm" onClick={() => handleDelete(team)} aria-label={`Eliminar ${team.name}`} style={{ color: 'var(--accent-danger)' }}>
-                        🗑️
-                      </button>
-                    </div>
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
+                  )}
+                  <div className="mobile-card-name-block">
+                    <strong className="mobile-card-name">{team.name}</strong>
+                    <code className="mobile-card-username">{team.user?.username || '—'}</code>
+                  </div>
+                </div>
+                <span className={`badge ${team.user?.isActive ? 'badge-active' : 'badge-inactive'}`}>
+                  {team.user?.isActive ? 'Activo' : 'Inactivo'}
+                </span>
+              </div>
+              <div className="mobile-card-footer">
+                <span className="mobile-card-meta">
+                  👥 {team._count?.players || 0} jugadores
+                </span>
+                <div className="mobile-card-actions">
+                  <button className="btn btn-ghost btn-sm" onClick={() => handleResetPassword(team)} aria-label={`Resetear contraseña de ${team.name}`}>
+                    🔑
+                  </button>
+                  <button className="btn btn-ghost btn-sm" onClick={() => handleToggleActive(team)} aria-label={`${team.user?.isActive ? 'Desactivar' : 'Activar'} ${team.name}`}>
+                    {team.user?.isActive ? '🚫' : '✅'}
+                  </button>
+                  <button className="btn btn-ghost btn-sm" onClick={() => handleDelete(team)} aria-label={`Eliminar ${team.name}`} style={{ color: 'var(--accent-danger)' }}>
+                    🗑️
+                  </button>
+                </div>
+              </div>
+            </div>
+          ))}
         </div>
       )}
 

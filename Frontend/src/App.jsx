@@ -4,6 +4,7 @@ import { AuthProvider, useAuth } from './context/AuthContext';
 import SkeletonLoader from './components/SkeletonLoader';
 
 /* ─── Lazy-loaded Pages (code-split per route) ───────────── */
+const LandingPage = lazy(() => import('./pages/public/LandingPage'));
 const LoginPage = lazy(() => import('./pages/public/LoginPage'));
 const TournamentDetailPage = lazy(() => import('./pages/public/TournamentDetailPage'));
 
@@ -60,6 +61,7 @@ export default function App() {
         <Suspense fallback={<PageFallback />}>
           <Routes>
             {/* Public */}
+            <Route path="/" element={<LandingPage />} />
             <Route path="/login" element={
               <RedirectIfAuth><LoginPage /></RedirectIfAuth>
             } />
@@ -87,7 +89,7 @@ export default function App() {
             </Route>
 
             {/* Catch-all */}
-            <Route path="*" element={<Navigate to="/login" replace />} />
+            <Route path="*" element={<Navigate to="/" replace />} />
           </Routes>
         </Suspense>
       </AuthProvider>

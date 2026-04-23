@@ -1,35 +1,17 @@
 /**
  * StandingsTable — Responsive tournament standings table.
  *
- * Mobile: horizontal scroll with sticky first columns + fade hint.
- * Desktop: full table without scroll.
+ * Mobile: ultra-compact, ALL columns fit screen (no scroll).
+ * Desktop: full comfortable table.
  *
- * @param {Array} standings       — array of standing objects from API
+ * @param {Array} standings          — array of standing objects from API
  * @param {string} [highlightTeamId] — teamId to highlight as "our team"
  * @param {boolean} [compact=false]  — show fewer columns
  * @param {string} [className]       — extra CSS class
  */
-import { useRef, useEffect, useCallback } from 'react';
 import './StandingsTable.css';
 
 export default function StandingsTable({ standings = [], highlightTeamId, compact = false, className = '' }) {
-  const wrapperRef = useRef(null);
-
-  const checkScroll = useCallback(() => {
-    const el = wrapperRef.current;
-    if (!el) return;
-    const atEnd = el.scrollLeft + el.clientWidth >= el.scrollWidth - 2;
-    el.classList.toggle('scrolled-end', atEnd);
-  }, []);
-
-  useEffect(() => {
-    const el = wrapperRef.current;
-    if (!el) return;
-    checkScroll();
-    el.addEventListener('scroll', checkScroll, { passive: true });
-    return () => el.removeEventListener('scroll', checkScroll);
-  }, [checkScroll]);
-
   if (standings.length === 0) {
     return (
       <div className="empty-state">
@@ -41,12 +23,12 @@ export default function StandingsTable({ standings = [], highlightTeamId, compac
   }
 
   return (
-    <div className={`standings-wrapper ${className}`} ref={wrapperRef} role="region" aria-label="Tabla de posiciones" tabIndex={0}>
+    <div className={`standings-wrapper ${className}`} role="region" aria-label="Tabla de posiciones">
       <table className="standings-table">
         <thead>
           <tr>
-            <th className="sticky-col col-pos">#</th>
-            <th className="sticky-col col-team">Equipo</th>
+            <th className="col-pos">#</th>
+            <th className="col-team">Equipo</th>
             <th>PJ</th>
             {!compact && <th>G</th>}
             {!compact && <th>E</th>}
@@ -62,12 +44,12 @@ export default function StandingsTable({ standings = [], highlightTeamId, compac
             const isUs = highlightTeamId && s.teamId === highlightTeamId;
             return (
               <tr key={s.id || i} className={isUs ? 'standings-highlight' : ''}>
-                <td className="sticky-col col-pos">
+                <td className="col-pos">
                   <span className="position-badge" aria-hidden="true">
                     {i === 0 ? '🥇' : i === 1 ? '🥈' : i === 2 ? '🥉' : s.position}
                   </span>
                 </td>
-                <td className="sticky-col col-team">
+                <td className="col-team">
                   <span className={`standings-team-name ${isUs ? 'is-us' : ''}`}>
                     {isUs && <span aria-hidden="true">👉 </span>}
                     {s.team?.name}
