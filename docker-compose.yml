@@ -30,7 +30,7 @@ services:
       JWT_REFRESH_SECRET: ${JWT_REFRESH_SECRET:-change-this-refresh-secret-in-production}
       NODE_ENV: production
       PORT: 3001
-      CORS_ORIGIN: http://localhost
+      CORS_ORIGIN: https://desdeelpie.com.ar,http://localhost
     volumes:
       - ./uploads:/app/uploads
     depends_on:
