@@ -11,13 +11,19 @@
 
 ## Variables Requeridas
 
-El archivo `/home/socioeducativo/.env` debe usar los nombres nuevos:
+El archivo real de produccion va en la VPS, no en GitHub:
 
 ```bash
-DB_PASSWORD=...
+/home/socioeducativo/.env
+```
 
-JWT_ACCESS_SECRET=...
-JWT_REFRESH_SECRET=...
+Debe tener exactamente estos nombres:
+
+```bash
+DB_PASSWORD=CAMBIAR_POR_PASSWORD_LARGO_POSTGRES
+
+JWT_ACCESS_SECRET=CAMBIAR_POR_SECRETO_LARGO_ACCESS
+JWT_REFRESH_SECRET=CAMBIAR_POR_SECRETO_LARGO_REFRESH
 ACCESS_TOKEN_EXPIRES_IN=15m
 REFRESH_TOKEN_EXPIRES_IN=7d
 
@@ -27,7 +33,7 @@ COOKIE_SECURE=true
 COOKIE_SAME_SITE=lax
 
 ADMIN_EMAIL=admin@desdeelpie.com.ar
-ADMIN_PASSWORD=...
+ADMIN_PASSWORD=CAMBIAR_POR_PASSWORD_TEMPORAL_ADMIN
 
 NGINX_PORT=8094
 
@@ -37,7 +43,59 @@ MAX_AUDIO_SIZE=52428800
 MAX_VIDEO_SIZE=262144000
 ```
 
+Notas:
+
+- `DATABASE_URL` no se carga en el `.env` raiz de la VPS. `docker-compose.yml` la construye internamente usando `DB_PASSWORD`.
+- `COOKIE_DOMAIN` queda vacio para cookie host-only en `desdeelpie.com.ar`.
+- `ADMIN_PASSWORD` se usa para crear o asegurar el admin inicial. Debe cambiarse despues del primer ingreso.
+- Los secretos JWT deben ser largos, distintos entre si y no reutilizados en otros proyectos.
+- No subir `/home/socioeducativo/.env` a GitHub.
+
 No usar los nombres viejos `JWT_SECRET`, `JWT_EXPIRATION` ni `JWT_REFRESH_EXPIRATION` en el deploy con Docker Compose.
+
+## Secrets Requeridos En GitHub Actions
+
+GitHub solo necesita secretos para entrar por SSH a la VPS:
+
+```bash
+VPS_HOST=31.97.241.220
+VPS_USER=USUARIO_SSH
+VPS_PRIVATE_KEY=CLAVE_PRIVADA_OPENSSH
+VPS_PORT=22
+```
+
+Se cargan en:
+
+```text
+GitHub > Settings > Secrets and variables > Actions
+```
+
+o en el environment `production` si el repositorio lo usa:
+
+```text
+GitHub > Settings > Environments > production > Environment secrets
+```
+
+No cargar `DB_PASSWORD`, `JWT_ACCESS_SECRET`, `JWT_REFRESH_SECRET` ni `ADMIN_PASSWORD` como GitHub secrets para este deploy. Esas variables viven en `/home/socioeducativo/.env`.
+
+## Crear El .env En La VPS
+
+En la VPS:
+
+```bash
+cd /home/socioeducativo
+nano .env
+```
+
+Pegar el bloque de variables de arriba y reemplazar todos los valores `CAMBIAR_POR_...`.
+
+Para generar secretos desde la VPS:
+
+```bash
+openssl rand -base64 48
+```
+
+Ejecutar ese comando una vez para `DB_PASSWORD`, otra para `JWT_ACCESS_SECRET`, otra para `JWT_REFRESH_SECRET` y otra para `ADMIN_PASSWORD`.
 
 ## Deploy Manual
 

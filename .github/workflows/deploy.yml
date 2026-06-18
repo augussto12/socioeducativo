@@ -17,6 +17,38 @@ env:
 jobs:
   verify:
     runs-on: ubuntu-latest
+    services:
+      postgres:
+        image: postgres:15-alpine
+        env:
+          POSTGRES_DB: socioeducativo
+          POSTGRES_USER: socio_admin
+          POSTGRES_PASSWORD: ci_postgres_password
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd "pg_isready -U socio_admin -d socioeducativo"
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+    env:
+      DATABASE_URL: postgresql://socio_admin:ci_postgres_password@localhost:5432/socioeducativo?schema=public
+      JWT_ACCESS_SECRET: github-actions-access-secret-for-verification
+      JWT_REFRESH_SECRET: github-actions-refresh-secret-for-verification
+      ACCESS_TOKEN_EXPIRES_IN: 15m
+      REFRESH_TOKEN_EXPIRES_IN: 7d
+      CORS_ORIGIN: http://localhost:5173
+      COOKIE_DOMAIN: ""
+      COOKIE_SECURE: "false"
+      COOKIE_SAME_SITE: lax
+      ADMIN_EMAIL: admin@socioeducativo.local
+      ADMIN_PASSWORD: ci-only-temporary-admin-password
+      UPLOAD_PUBLIC_DIR: ./uploads/public
+      UPLOAD_PRIVATE_DIR: ./uploads/private
+      MAX_IMAGE_SIZE: 10485760
+      MAX_DOCUMENT_SIZE: 26214400
+      MAX_AUDIO_SIZE: 52428800
+      MAX_VIDEO_SIZE: 262144000
 
     steps:
       - name: Checkout repository
@@ -81,7 +113,7 @@ jobs:
             . ./.env
             set +a
 
-            required_vars="DB_PASSWORD JWT_ACCESS_SECRET JWT_REFRESH_SECRET CORS_ORIGIN COOKIE_SECURE COOKIE_SAME_SITE ADMIN_EMAIL ADMIN_PASSWORD"
+            required_vars="DB_PASSWORD JWT_ACCESS_SECRET JWT_REFRESH_SECRET ACCESS_TOKEN_EXPIRES_IN REFRESH_TOKEN_EXPIRES_IN CORS_ORIGIN COOKIE_SECURE COOKIE_SAME_SITE ADMIN_EMAIL ADMIN_PASSWORD NGINX_PORT MAX_IMAGE_SIZE MAX_DOCUMENT_SIZE MAX_AUDIO_SIZE MAX_VIDEO_SIZE"
             for var in $required_vars; do
               if ! grep -Eq "^${var}=.+" .env; then
                 echo "Missing required variable in /home/socioeducativo/.env: ${var}"
