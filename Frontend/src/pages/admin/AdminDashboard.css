@@ -1,83 +1,64 @@
-/* ═══════════════════════════════════════════════════════════════
-   AdminDashboard — Mobile-first responsive dashboard
-   ═══════════════════════════════════════════════════════════════ */
-
-.admin-dashboard .stats-grid {
+.admin-metrics-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
   gap: var(--space-md);
-  margin-bottom: var(--space-xl);
 }
 
-.dashboard-section {
-  margin-bottom: var(--space-xl);
+.admin-metric-card {
+  padding: var(--space-lg);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-md);
+  background: var(--bg-card);
+  box-shadow: var(--shadow-sm);
 }
 
-.section-title {
-  font-size: var(--text-lg);
-  font-weight: 700;
-  margin-bottom: var(--space-md);
+.admin-metric-card span {
+  display: block;
   color: var(--text-secondary);
-}
-
-.quick-actions {
-  display: flex;
-  gap: 0.75rem;
-  flex-wrap: wrap;
-}
-
-.tournaments-list {
-  display: flex;
-  flex-direction: column;
-  gap: var(--space-sm);
-}
-
-.tournament-row {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  padding: var(--space-md);
-  cursor: pointer;
-  gap: var(--space-sm);
-  min-height: var(--touch-min);
-  touch-action: manipulation;
-}
-.tournament-row:active {
-  transform: scale(0.99);
-}
-
-.tournament-row-info {
-  display: flex;
-  align-items: center;
-  gap: var(--space-md);
-  flex: 1;
-  min-width: 0;
-}
-
-.tournament-row-icon {
-  font-size: 1.5rem;
-  flex-shrink: 0;
-}
-
-.tournament-row-name {
-  font-weight: 600;
-  font-size: var(--text-base);
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-}
-
-.tournament-row-meta {
   font-size: var(--text-xs);
-  color: var(--text-muted);
-  margin-top: 0.1rem;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
 }
 
-@media (min-width: 768px) {
-  .tournament-row-icon {
-    font-size: 1.75rem;
+.admin-metric-card strong {
+  display: block;
+  margin-top: var(--space-sm);
+  color: var(--text-primary);
+  font-family: var(--font-display);
+  font-size: var(--text-3xl);
+}
+
+.admin-dashboard-grid {
+  display: grid;
+  gap: var(--space-md);
+}
+
+.admin-dashboard-list {
+  display: grid;
+  gap: var(--space-sm);
+}
+
+.admin-dashboard-item {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: var(--space-md);
+  padding: var(--space-md);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-md);
+  background: rgba(255, 255, 255, 0.025);
+}
+
+.admin-dashboard-item p,
+.admin-dashboard-date {
+  margin-top: 0.25rem;
+  color: var(--text-secondary);
+  font-size: var(--text-sm);
+}
+
+@media (min-width: 1024px) {
+  .admin-dashboard-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
   }
 }

@@ -3,55 +3,70 @@ import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import { AuthProvider, useAuth } from './context/AuthContext';
 import SkeletonLoader from './components/SkeletonLoader';
 
-/* ─── Lazy-loaded Pages (code-split per route) ───────────── */
-const LandingPage = lazy(() => import('./pages/public/LandingPage'));
+const HomePage = lazy(() => import('./pages/public/HomePage'));
+const AboutPage = lazy(() => import('./pages/public/AboutPage'));
+const ProjectsPage = lazy(() => import('./pages/public/ProjectsPage'));
+const ProjectDetailPage = lazy(() => import('./pages/public/ProjectDetailPage'));
+const RecordDetailPage = lazy(() => import('./pages/public/RecordDetailPage'));
+const NotFoundPage = lazy(() => import('./pages/public/NotFoundPage'));
 const LoginPage = lazy(() => import('./pages/public/LoginPage'));
-const TournamentDetailPage = lazy(() => import('./pages/public/TournamentDetailPage'));
+const ChangePasswordPage = lazy(() => import('./pages/public/ChangePasswordPage'));
+const PublicLayout = lazy(() => import('./components/public/PublicLayout'));
 
 const AdminLayout = lazy(() => import('./layouts/AdminLayout'));
 const AdminDashboard = lazy(() => import('./pages/admin/AdminDashboard'));
-const AdminTeams = lazy(() => import('./pages/admin/AdminTeams'));
-const AdminPlayers = lazy(() => import('./pages/admin/AdminPlayers'));
-const AdminGameTypes = lazy(() => import('./pages/admin/AdminGameTypes'));
-const AdminTournaments = lazy(() => import('./pages/admin/AdminTournaments'));
-const AdminMatches = lazy(() => import('./pages/admin/AdminMatches'));
+const AdminSiteContent = lazy(() => import('./pages/admin/AdminSiteContent'));
+const AdminProjects = lazy(() => import('./pages/admin/AdminProjects'));
+const AdminProjectMembers = lazy(() => import('./pages/admin/AdminProjectMembers'));
+const AdminRecords = lazy(() => import('./pages/admin/AdminRecords'));
+const AdminUsers = lazy(() => import('./pages/admin/AdminUsers'));
+const AdminAuditLogs = lazy(() => import('./pages/admin/AdminAuditLogs'));
 
-const TeamLayout = lazy(() => import('./layouts/TeamLayout'));
-const TeamDashboard = lazy(() => import('./pages/team/TeamDashboard'));
-const TeamStandings = lazy(() => import('./pages/team/TeamStandings'));
-const TeamTournaments = lazy(() => import('./pages/team/TeamTournaments'));
-const TeamProfile = lazy(() => import('./pages/team/TeamProfile'));
+const StaffLayout = lazy(() => import('./layouts/StaffLayout'));
+const StaffDashboard = lazy(() => import('./pages/staff/StaffDashboard'));
+const StaffProjects = lazy(() => import('./pages/staff/StaffProjects'));
+const StaffProjectDetail = lazy(() => import('./pages/staff/StaffProjectDetail'));
+const StaffRecords = lazy(() => import('./pages/staff/StaffRecords'));
+const StaffRecordCreate = lazy(() => import('./pages/staff/StaffRecordCreate'));
+const StaffRecordDetail = lazy(() => import('./pages/staff/StaffRecordDetail'));
 
-/* ─── Loading Fallback ───────────────────────────────────── */
 function PageFallback() {
   return <SkeletonLoader variant="full-page" />;
 }
 
-/* ─── Protected Route Wrappers ───────────────────────────── */
 function RequireAdmin({ children }) {
   const { user, loading, isAdmin } = useAuth();
   if (loading) return <PageFallback />;
   if (!user) return <Navigate to="/login" replace />;
-  if (!isAdmin) return <Navigate to="/team" replace />;
+  if (user.mustChangePassword) return <Navigate to="/change-password" replace />;
+  if (!isAdmin) return <Navigate to="/staff" replace />;
   return children;
 }
 
-function RequireTeam({ children }) {
-  const { user, loading, isTeam } = useAuth();
+function RequireStaff({ children }) {
+  const { user, loading, isStaff, isAdmin } = useAuth();
   if (loading) return <PageFallback />;
   if (!user) return <Navigate to="/login" replace />;
-  if (!isTeam) return <Navigate to="/admin" replace />;
+  if (user.mustChangePassword) return <Navigate to="/change-password" replace />;
+  if (!isStaff && !isAdmin) return <Navigate to="/admin" replace />;
+  return children;
+}
+
+function RequireAuth({ children }) {
+  const { user, loading } = useAuth();
+  if (loading) return <PageFallback />;
+  if (!user) return <Navigate to="/login" replace />;
   return children;
 }
 
 function RedirectIfAuth({ children }) {
   const { user, loading, isAdmin } = useAuth();
   if (loading) return <PageFallback />;
-  if (user) return <Navigate to={isAdmin ? '/admin' : '/team'} replace />;
+  if (user?.mustChangePassword) return <Navigate to="/change-password" replace />;
+  if (user) return <Navigate to={isAdmin ? '/admin' : '/staff'} replace />;
   return children;
 }
 
-/* ─── App ────────────────────────────────────────────────── */
 export default function App() {
   return (
     <BrowserRouter>
@@ -61,37 +76,65 @@ export default function App() {
         </a>
         <Suspense fallback={<PageFallback />}>
           <Routes>
-            {/* Public */}
-            <Route path="/" element={<LandingPage />} />
-            <Route path="/login" element={
-              <RedirectIfAuth><LoginPage /></RedirectIfAuth>
-            } />
-            <Route path="/tournament/:id" element={<TournamentDetailPage />} />
+            <Route element={<PublicLayout />}>
+              <Route index element={<HomePage />} />
+              <Route path="quienes-somos" element={<AboutPage />} />
+              <Route path="proyectos" element={<ProjectsPage />} />
+              <Route path="proyectos/:slug" element={<ProjectDetailPage />} />
+              <Route path="registros/:id" element={<RecordDetailPage />} />
+              <Route path="404" element={<NotFoundPage />} />
+            </Route>
+            <Route
+              path="/login"
+              element={
+                <RedirectIfAuth>
+                  <LoginPage />
+                </RedirectIfAuth>
+              }
+            />
+            <Route
+              path="/change-password"
+              element={
+                <RequireAuth>
+                  <ChangePasswordPage />
+                </RequireAuth>
+              }
+            />
 
-            {/* Admin */}
-            <Route path="/admin" element={
-              <RequireAdmin><AdminLayout /></RequireAdmin>
-            }>
+            <Route
+              path="/admin"
+              element={
+                <RequireAdmin>
+                  <AdminLayout />
+                </RequireAdmin>
+              }
+            >
               <Route index element={<AdminDashboard />} />
-              <Route path="teams" element={<AdminTeams />} />
-              <Route path="teams/:teamId/players" element={<AdminPlayers />} />
-              <Route path="game-types" element={<AdminGameTypes />} />
-              <Route path="tournaments" element={<AdminTournaments />} />
-              <Route path="tournaments/:id" element={<AdminMatches />} />
+              <Route path="contenido" element={<AdminSiteContent />} />
+              <Route path="proyectos" element={<AdminProjects />} />
+              <Route path="proyectos/:id/miembros" element={<AdminProjectMembers />} />
+              <Route path="registros" element={<AdminRecords />} />
+              <Route path="usuarios" element={<AdminUsers />} />
+              <Route path="auditoria" element={<AdminAuditLogs />} />
             </Route>
 
-            {/* Team */}
-            <Route path="/team" element={
-              <RequireTeam><TeamLayout /></RequireTeam>
-            }>
-              <Route index element={<TeamDashboard />} />
-              <Route path="standings" element={<TeamStandings />} />
-              <Route path="tournaments" element={<TeamTournaments />} />
-              <Route path="profile" element={<TeamProfile />} />
+            <Route
+              path="/staff"
+              element={
+                <RequireStaff>
+                  <StaffLayout />
+                </RequireStaff>
+              }
+            >
+              <Route index element={<StaffDashboard />} />
+              <Route path="proyectos" element={<StaffProjects />} />
+              <Route path="proyectos/:id" element={<StaffProjectDetail />} />
+              <Route path="proyectos/:projectId/registros/nuevo" element={<StaffRecordCreate />} />
+              <Route path="registros" element={<StaffRecords />} />
+              <Route path="registros/:id" element={<StaffRecordDetail />} />
             </Route>
 
-            {/* Catch-all */}
-            <Route path="*" element={<Navigate to="/" replace />} />
+            <Route path="*" element={<PublicLayout><NotFoundPage /></PublicLayout>} />
           </Routes>
         </Suspense>
       </AuthProvider>

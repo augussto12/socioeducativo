@@ -14,11 +14,11 @@ function generatePassword(length = 10) {
 }
 
 /**
- * Generate a username from team name.
+ * Generate a username from a display name.
  * Converts to lowercase, removes special chars, replaces spaces with underscores.
  */
-function generateUsername(teamName) {
-  return teamName
+function generateUsername(displayName) {
+  return displayName
     .toLowerCase()
     .normalize('NFD')
     .replace(/[\u0300-\u036f]/g, '') // Remove accents

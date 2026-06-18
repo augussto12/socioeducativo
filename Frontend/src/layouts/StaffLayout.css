@@ -1,0 +1,117 @@
+.staff-layout {
+  min-height: 100dvh;
+  background: var(--bg-primary);
+  padding-bottom: calc(60px + env(safe-area-inset-bottom, 0px));
+}
+
+.staff-topbar {
+  position: sticky;
+  top: 0;
+  z-index: var(--z-sticky);
+  background: rgba(17, 24, 39, 0.94);
+  border-bottom: 1px solid var(--border-color);
+  backdrop-filter: blur(16px);
+}
+
+.staff-topbar-inner {
+  max-width: 1120px;
+  margin: 0 auto;
+  padding: var(--space-sm) var(--space-md);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-md);
+}
+
+.staff-brand {
+  display: flex;
+  align-items: center;
+  gap: var(--space-sm);
+}
+
+.staff-brand-mark {
+  width: 40px;
+  height: 40px;
+  border-radius: var(--radius-md);
+  background: var(--gradient-primary);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 900;
+}
+
+.staff-title {
+  display: block;
+  font-family: var(--font-display);
+  font-weight: 800;
+}
+
+.staff-subtitle {
+  display: block;
+  color: var(--text-muted);
+  font-size: var(--text-xs);
+}
+
+.staff-desktop-nav {
+  display: none;
+}
+
+.staff-user {
+  display: flex;
+  align-items: center;
+  gap: var(--space-sm);
+}
+
+.staff-user-name {
+  display: none;
+  color: var(--text-secondary);
+  font-size: var(--text-sm);
+}
+
+.staff-logout-btn {
+  background: transparent;
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-md);
+  color: var(--text-secondary);
+  cursor: pointer;
+  min-height: 40px;
+  padding: 0 var(--space-sm);
+}
+
+.staff-content {
+  max-width: 1120px;
+  margin: 0 auto;
+  padding: var(--space-md);
+}
+
+@media (min-width: 768px) {
+  .staff-layout {
+    padding-bottom: 0;
+  }
+
+  .staff-desktop-nav {
+    display: flex;
+    align-items: center;
+    gap: var(--space-xs);
+  }
+
+  .staff-desktop-link {
+    color: var(--text-secondary);
+    padding: var(--space-sm) var(--space-md);
+    border-radius: var(--radius-md);
+    font-weight: 600;
+  }
+
+  .staff-desktop-link.active {
+    background: rgba(99, 102, 241, 0.12);
+    color: var(--accent-primary);
+  }
+
+  .staff-user-name {
+    display: inline;
+  }
+
+  .staff-content {
+    padding: var(--space-lg);
+  }
+}

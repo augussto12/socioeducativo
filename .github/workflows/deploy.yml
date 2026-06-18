@@ -1,33 +1,116 @@
-name: Auto Deploy to VPS
+name: Verify and Deploy to VPS
 
 on:
   push:
     branches:
       - main
+  workflow_dispatch:
+    inputs:
+      branch:
+        description: Branch to deploy
+        required: true
+        default: main
+
+env:
+  DEPLOY_BRANCH: ${{ github.event.inputs.branch || github.ref_name }}
 
 jobs:
-  deploy:
+  verify:
     runs-on: ubuntu-latest
 
     steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+          cache-dependency-path: |
+            Backend/package-lock.json
+            Frontend/package-lock.json
+
+      - name: Install backend dependencies
+        working-directory: Backend
+        run: npm ci
+
+      - name: Validate Prisma schema
+        working-directory: Backend
+        run: npx prisma validate
+
+      - name: Run backend tests
+        working-directory: Backend
+        run: npm test
+
+      - name: Audit backend production dependencies
+        working-directory: Backend
+        run: npm audit --omit=dev --audit-level=high
+
+      - name: Install frontend dependencies
+        working-directory: Frontend
+        run: npm ci
+
+      - name: Build frontend
+        working-directory: Frontend
+        run: npm run build
+
+      - name: Audit frontend production dependencies
+        working-directory: Frontend
+        run: npm audit --omit=dev --audit-level=high
+
+  deploy:
+    runs-on: ubuntu-latest
+    needs: verify
+    environment: production
+
+    steps:
       - name: Deploy via SSH
-        uses: appleboy/ssh-action@master
+        uses: appleboy/ssh-action@v1.2.5
         with:
           host: ${{ secrets.VPS_HOST }}
           username: ${{ secrets.VPS_USER }}
-          password: ${{ secrets.VPS_PASSWORD }}
-          # Si prefieres usar llave SSH en lugar de contraseña, comenta `password` y descomenta `key`:
-          # key: ${{ secrets.VPS_PRIVATE_KEY }}
-          port: ${{ secrets.VPS_PORT }} # Opcional, usualmente es 22 pero Hostinger a veces usa 22 o 6969
+          key: ${{ secrets.VPS_PRIVATE_KEY }}
+          port: ${{ secrets.VPS_PORT }}
+          script_stop: true
           script: |
-            # Ir la nueva ubicacion provista para hostear el proyecto
-            cd /home/socioeducativo 
-            
-            # Traer los ultimos cambios de GitHub
-            git pull origin main
-            
-            # Detener contenedores actuales
-            docker compose down
-            
-            # Levantar contenedores reconstruyendo las imagenes (por si hubo cambios en Frontend/Backend)
-            docker compose up -d --build
+            set -e
+            cd /home/socioeducativo
+
+            set -a
+            . ./.env
+            set +a
+
+            required_vars="DB_PASSWORD JWT_ACCESS_SECRET JWT_REFRESH_SECRET CORS_ORIGIN COOKIE_SECURE COOKIE_SAME_SITE ADMIN_EMAIL ADMIN_PASSWORD"
+            for var in $required_vars; do
+              if ! grep -Eq "^${var}=.+" .env; then
+                echo "Missing required variable in /home/socioeducativo/.env: ${var}"
+                exit 1
+              fi
+            done
+
+            docker network inspect nginx-proxy-manager_default >/dev/null
+
+            git fetch origin "${{ env.DEPLOY_BRANCH }}"
+            git reset --hard "origin/${{ env.DEPLOY_BRANCH }}"
+
+            docker compose config --quiet
+            docker compose up -d --build --remove-orphans
+
+            for i in $(seq 1 30); do
+              if curl -fsS --max-time 5 http://127.0.0.1:${NGINX_PORT:-8094}/api/ready >/dev/null; then
+                break
+              fi
+
+              if [ "$i" -eq 30 ]; then
+                docker compose ps
+                docker compose logs --tail=160 backend nginx
+                exit 1
+              fi
+
+              sleep 5
+            done
+
+            curl -fsS --max-time 5 http://127.0.0.1:${NGINX_PORT:-8094}/api/health
+            curl -fsS --max-time 5 http://127.0.0.1:${NGINX_PORT:-8094}/api/ready
+            docker compose ps

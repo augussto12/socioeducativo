@@ -1,5 +1,12 @@
 import { createContext, useContext, useState, useEffect, useCallback } from 'react';
-import { login as loginApi, getMe, logout as logoutApi } from '../api/auth.api';
+import {
+  login as loginApi,
+  getMe,
+  logout as logoutApi,
+  changePassword as changePasswordApi,
+  refreshToken,
+} from '../api/auth.api';
+import { clearAccessToken, setAccessToken } from '../api/tokenStore';
 
 const AuthContext = createContext(null);
 
@@ -8,16 +15,12 @@ export function AuthProvider({ children }) {
   const [loading, setLoading] = useState(true);
 
   const checkAuth = useCallback(async () => {
-    const token = localStorage.getItem('accessToken');
-    if (!token) {
-      setLoading(false);
-      return;
-    }
     try {
-      const { data } = await getMe();
-      setUser(data);
+      const { data } = await refreshToken();
+      if (data.accessToken) setAccessToken(data.accessToken);
+      setUser(data.user || null);
     } catch {
-      localStorage.removeItem('accessToken');
+      clearAccessToken();
       setUser(null);
     } finally {
       setLoading(false);
@@ -28,26 +31,34 @@ export function AuthProvider({ children }) {
     checkAuth();
   }, [checkAuth]);
 
-  const login = async (username, password) => {
-    const { data } = await loginApi(username, password);
-    localStorage.setItem('accessToken', data.accessToken);
+  const login = async (email, password) => {
+    const { data } = await loginApi(email, password);
+    setAccessToken(data.accessToken);
     setUser(data.user);
     return data.user;
   };
 
   const logout = async () => {
     try { await logoutApi(); } catch { /* ignore */ }
-    localStorage.removeItem('accessToken');
+    clearAccessToken();
     setUser(null);
+  };
+
+  const changePassword = async (currentPassword, newPassword) => {
+    const { data } = await changePasswordApi(currentPassword, newPassword);
+    if (data.accessToken) setAccessToken(data.accessToken);
+    if (data.user) setUser(data.user);
+    return data;
   };
 
   const value = {
     user,
     login,
     logout,
+    changePassword,
     loading,
     isAdmin: user?.role === 'ADMIN',
-    isTeam: user?.role === 'TEAM',
+    isStaff: user?.role === 'STAFF',
     isAuthenticated: !!user,
   };
 

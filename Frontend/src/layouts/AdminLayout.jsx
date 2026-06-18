@@ -3,9 +3,6 @@ import { Outlet, NavLink, useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import './AdminLayout.css';
 
-/**
- * AdminLayout — Mobile: topbar + hamburger drawer. Desktop: fixed sidebar.
- */
 export default function AdminLayout() {
   const { user, logout } = useAuth();
   const navigate = useNavigate();
@@ -16,43 +13,37 @@ export default function AdminLayout() {
     navigate('/login');
   }, [logout, navigate]);
 
-  const toggleDrawer = useCallback(() => {
-    setDrawerOpen(prev => !prev);
-  }, []);
-
   const closeDrawer = useCallback(() => {
     setDrawerOpen(false);
   }, []);
 
   const navItems = [
-    { to: '/admin', label: 'Dashboard', icon: '📊', end: true },
-    { to: '/admin/teams', label: 'Equipos', icon: '🛡️' },
-    { to: '/admin/game-types', label: 'Juegos', icon: '🎮' },
-    { to: '/admin/tournaments', label: 'Torneos', icon: '🏆' },
+    { to: '/admin', label: 'Dashboard', icon: 'Inicio', end: true },
+    { to: '/admin/contenido', label: 'Contenido', icon: 'CMS' },
+    { to: '/admin/proyectos', label: 'Proyectos', icon: 'PR' },
+    { to: '/admin/registros', label: 'Registros', icon: 'RG' },
+    { to: '/admin/usuarios', label: 'Usuarios', icon: 'US' },
+    { to: '/admin/auditoria', label: 'Auditoria', icon: 'AU' },
   ];
 
   return (
     <div className="admin-layout">
-      {/* ─── Mobile Topbar ─────────────────────────────── */}
       <header className="admin-topbar" role="banner">
         <button
           className="hamburger-btn"
-          onClick={toggleDrawer}
-          aria-label={drawerOpen ? 'Cerrar menú' : 'Abrir menú'}
+          onClick={() => setDrawerOpen((open) => !open)}
+          aria-label={drawerOpen ? 'Cerrar menu' : 'Abrir menu'}
           aria-expanded={drawerOpen}
           aria-controls="admin-drawer"
         >
           <span className={`hamburger-line ${drawerOpen ? 'open' : ''}`} aria-hidden="true" />
         </button>
-        <span className="admin-topbar-title">
-          <span aria-hidden="true">🏆</span> SocioEduca
-        </span>
+        <span className="admin-topbar-title">SocioEduca Admin</span>
         <div className="admin-topbar-user">
-          <span className="admin-topbar-avatar" aria-hidden="true">👤</span>
+          <span className="admin-topbar-avatar" aria-hidden="true">AD</span>
         </div>
       </header>
 
-      {/* ─── Drawer Overlay ────────────────────────────── */}
       {drawerOpen && (
         <div
           className="drawer-overlay"
@@ -61,15 +52,14 @@ export default function AdminLayout() {
         />
       )}
 
-      {/* ─── Sidebar / Drawer ──────────────────────────── */}
       <aside
         id="admin-drawer"
         className={`admin-sidebar ${drawerOpen ? 'open' : ''}`}
         role="navigation"
-        aria-label="Navegación administrativa"
+        aria-label="Navegacion administrativa"
       >
         <div className="sidebar-header">
-          <div className="sidebar-logo" aria-hidden="true">🏆</div>
+          <div className="sidebar-logo" aria-hidden="true">SE</div>
           <h2 className="sidebar-title">SocioEduca</h2>
           <span className="sidebar-subtitle">Panel Admin</span>
         </div>
@@ -91,9 +81,9 @@ export default function AdminLayout() {
 
         <div className="sidebar-footer">
           <div className="sidebar-user">
-            <div className="sidebar-user-avatar" aria-hidden="true">👤</div>
+            <div className="sidebar-user-avatar" aria-hidden="true">AD</div>
             <div>
-              <div className="sidebar-user-name">{user?.username}</div>
+              <div className="sidebar-user-name">{user?.name || user?.email}</div>
               <div className="sidebar-user-role">Administrador</div>
             </div>
           </div>
@@ -102,12 +92,11 @@ export default function AdminLayout() {
             onClick={handleLogout}
             style={{ marginTop: 'var(--space-sm)' }}
           >
-            Cerrar Sesión
+            Cerrar sesion
           </button>
         </div>
       </aside>
 
-      {/* ─── Main Content ──────────────────────────────── */}
       <main className="admin-main" id="main-content" role="main">
         <Outlet />
       </main>

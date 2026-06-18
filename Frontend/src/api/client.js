@@ -1,4 +1,5 @@
 import axios from 'axios';
+import { clearAccessToken, getAccessToken, setAccessToken } from './tokenStore';
 
 const API_URL = import.meta.env.VITE_API_URL || (import.meta.env.PROD ? '/api' : 'http://localhost:3001/api');
 
@@ -10,7 +11,7 @@ const client = axios.create({
 
 // Request interceptor: attach access token
 client.interceptors.request.use((config) => {
-  const token = localStorage.getItem('accessToken');
+  const token = getAccessToken();
   if (token) {
     config.headers.Authorization = `Bearer ${token}`;
   }
@@ -34,6 +35,15 @@ client.interceptors.response.use(
   async (error) => {
     const originalRequest = error.config;
 
+    if (
+      error.response?.status === 403 &&
+      error.response?.data?.code === 'PASSWORD_CHANGE_REQUIRED' &&
+      window.location.pathname !== '/change-password'
+    ) {
+      window.location.href = '/change-password';
+      return Promise.reject(error);
+    }
+
     if (error.response?.status === 401 && error.response?.data?.code === 'TOKEN_EXPIRED' && !originalRequest._retry) {
       if (isRefreshing) {
         return new Promise((resolve, reject) => {
@@ -49,14 +59,16 @@ client.interceptors.response.use(
 
       try {
         const { data } = await axios.post(`${API_URL}/auth/refresh`, {}, { withCredentials: true });
-        localStorage.setItem('accessToken', data.accessToken);
+        setAccessToken(data.accessToken);
         processQueue(null, data.accessToken);
         originalRequest.headers.Authorization = `Bearer ${data.accessToken}`;
         return client(originalRequest);
       } catch (err) {
         processQueue(err, null);
-        localStorage.removeItem('accessToken');
-        window.location.href = '/login';
+        clearAccessToken();
+        if (!originalRequest.skipAuthRedirect) {
+          window.location.href = '/login';
+        }
         return Promise.reject(err);
       } finally {
         isRefreshing = false;

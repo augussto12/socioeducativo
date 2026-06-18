@@ -1,0 +1,214 @@
+.staff-page {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-lg);
+}
+
+.staff-hero,
+.staff-section-header,
+.staff-detail-header {
+  display: flex;
+  justify-content: space-between;
+  gap: var(--space-md);
+  align-items: flex-start;
+  flex-wrap: wrap;
+}
+
+.staff-page-copy {
+  color: var(--text-secondary);
+  max-width: 760px;
+  margin-top: var(--space-sm);
+}
+
+.staff-actions,
+.staff-form-actions {
+  display: flex;
+  gap: var(--space-sm);
+  flex-wrap: wrap;
+}
+
+.staff-metric-grid,
+.staff-quick-grid,
+.staff-detail-grid {
+  display: grid;
+  gap: var(--space-md);
+}
+
+.staff-metric-grid {
+  grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+}
+
+.staff-metric-card,
+.staff-panel,
+.staff-quick-link {
+  padding: var(--space-lg);
+  background: var(--bg-card);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-md);
+  box-shadow: var(--shadow-sm);
+}
+
+.staff-metric-card {
+  display: grid;
+  gap: var(--space-xs);
+}
+
+.staff-metric-card span,
+.staff-section-header p,
+.staff-panel p,
+.staff-detail-list dt,
+.staff-quick-link span {
+  color: var(--text-secondary);
+}
+
+.staff-metric-card strong {
+  font-family: var(--font-mono);
+  font-size: var(--text-2xl);
+}
+
+.staff-quick-grid {
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+}
+
+.staff-quick-link {
+  color: var(--text-primary);
+  display: grid;
+  gap: var(--space-xs);
+}
+
+.staff-list,
+.staff-project-grid {
+  display: grid;
+  gap: var(--space-md);
+}
+
+.staff-project-grid {
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+}
+
+.staff-detail-grid {
+  grid-template-columns: 1fr;
+}
+
+.staff-detail-list {
+  display: grid;
+  gap: var(--space-md);
+}
+
+.staff-detail-list dt {
+  font-size: var(--text-xs);
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  margin-bottom: 0.2rem;
+}
+
+.staff-detail-list dd {
+  white-space: pre-wrap;
+}
+
+.staff-form {
+  display: grid;
+  gap: var(--space-md);
+}
+
+.staff-form-grid {
+  display: grid;
+  gap: var(--space-md);
+}
+
+.staff-field {
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+}
+
+.staff-field span {
+  color: var(--text-secondary);
+  font-size: var(--text-xs);
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.staff-field input,
+.staff-field textarea,
+.staff-field select {
+  width: 100%;
+  min-height: 44px;
+  padding: 0.75rem 0.9rem;
+  background: var(--bg-input);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-md);
+  color: var(--text-primary);
+  font: inherit;
+}
+
+.staff-field textarea {
+  min-height: 140px;
+  resize: vertical;
+}
+
+.staff-field input:focus,
+.staff-field textarea:focus,
+.staff-field select:focus {
+  border-color: var(--accent-primary);
+  box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.15);
+  outline: none;
+}
+
+.staff-tabs {
+  display: flex;
+  gap: var(--space-sm);
+  flex-wrap: wrap;
+}
+
+.staff-tab {
+  min-height: 40px;
+  padding: 0.5rem 0.8rem;
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-md);
+  background: var(--bg-card);
+  color: var(--text-secondary);
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.staff-tab.active {
+  color: var(--text-primary);
+  border-color: var(--accent-primary);
+  background: rgba(99, 102, 241, 0.14);
+}
+
+.staff-notice {
+  padding: var(--space-md);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-md);
+  background: rgba(99, 102, 241, 0.08);
+  color: var(--text-secondary);
+}
+
+.staff-notice.warning {
+  border-color: rgba(245, 158, 11, 0.35);
+  background: rgba(245, 158, 11, 0.08);
+}
+
+.staff-notice.danger {
+  border-color: rgba(239, 68, 68, 0.35);
+  background: rgba(239, 68, 68, 0.08);
+}
+
+.staff-feedback {
+  padding: 0.75rem var(--space-md);
+  border-radius: var(--radius-md);
+}
+
+@media (min-width: 768px) {
+  .staff-form-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .staff-detail-grid {
+    grid-template-columns: minmax(0, 1.6fr) minmax(280px, 0.8fr);
+  }
+}

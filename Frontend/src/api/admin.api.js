@@ -1,5 +1,7 @@
 import client from './client';
 
-export const getAdminStats = () => client.get('/admin/stats');
-export const getAdminUsers = () => client.get('/admin/users');
-export const getExportStandings = (tournamentId) => client.get(`/export/standings/${tournamentId}`);
+export const getAdminDashboard = () =>
+  client.get('/admin/dashboard');
+
+export const getAuditLogs = (params = {}) =>
+  client.get('/admin/audit-logs', { params });

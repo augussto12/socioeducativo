@@ -4,7 +4,7 @@ import { useAuth } from '../../context/AuthContext';
 import './LoginPage.css';
 
 export default function LoginPage() {
-  const [username, setUsername] = useState('');
+  const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
@@ -17,10 +17,10 @@ export default function LoginPage() {
     setLoading(true);
 
     try {
-      const user = await login(username, password);
-      navigate(user.role === 'ADMIN' ? '/admin' : '/team');
+      const user = await login(email, password);
+      navigate(user.mustChangePassword ? '/change-password' : (user.role === 'ADMIN' ? '/admin' : '/staff'));
     } catch (err) {
-      setError(err.response?.data?.error || 'Error de conexión. Intentá de nuevo.');
+      setError(err.response?.data?.error || 'Error de conexion. Intenta de nuevo.');
     } finally {
       setLoading(false);
     }
@@ -29,46 +29,46 @@ export default function LoginPage() {
   return (
     <div className="login-page">
       <div className="login-bg-effects">
-        <div className="login-orb login-orb-1"></div>
-        <div className="login-orb login-orb-2"></div>
-        <div className="login-orb login-orb-3"></div>
+        <div className="login-orb login-orb-1" />
+        <div className="login-orb login-orb-2" />
+        <div className="login-orb login-orb-3" />
       </div>
 
       <div className="login-card glass-card animate-slide-up">
         <div className="login-header">
-          <div className="login-logo">🏆</div>
+          <div className="login-logo">SE</div>
           <h1 className="login-title">SocioEduca</h1>
-          <p className="login-subtitle">Sistema de Torneos</p>
+          <p className="login-subtitle">Centro socioeducativo</p>
         </div>
 
         <form className="login-form" onSubmit={handleSubmit}>
           {error && (
             <div className="login-error animate-fade-in">
-              <span>⚠️</span> {error}
+              {error}
             </div>
           )}
 
           <div className="form-group">
-            <label className="form-label" htmlFor="username">Usuario</label>
+            <label className="form-label" htmlFor="email">Email</label>
             <input
-              id="username"
-              type="text"
+              id="email"
+              type="email"
               className="form-input"
-              placeholder="Tu nombre de usuario"
-              value={username}
-              onChange={(e) => setUsername(e.target.value)}
+              placeholder="tu@email.com"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
               autoFocus
               required
             />
           </div>
 
           <div className="form-group">
-            <label className="form-label" htmlFor="password">Contraseña</label>
+            <label className="form-label" htmlFor="password">Contrasena</label>
             <input
               id="password"
               type="password"
               className="form-input"
-              placeholder="Tu contraseña"
+              placeholder="Tu contrasena"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
               required
@@ -93,7 +93,7 @@ export default function LoginPage() {
         </form>
 
         <div className="login-footer">
-          <p>Plataforma de torneos socioeducativos</p>
+          <p>Acceso para administradores y equipo pedagogico</p>
         </div>
       </div>
     </div>

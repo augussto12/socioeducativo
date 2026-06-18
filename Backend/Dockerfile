@@ -6,14 +6,16 @@ RUN apk add --no-cache openssl
 WORKDIR /app
 
 COPY package*.json ./
-RUN npm install --omit=dev
+RUN npm ci --omit=dev
 
 COPY prisma ./prisma
 RUN npx prisma generate
 
 COPY src ./src
 
-RUN mkdir -p uploads/shields
+RUN mkdir -p uploads/public uploads/private uploads/tmp && chown -R node:node /app/uploads
+
+USER node
 
 EXPOSE 3001
 

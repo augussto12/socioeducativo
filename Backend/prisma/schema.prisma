@@ -7,193 +7,256 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-enum Role {
+enum UserRole {
   ADMIN
-  TEAM
+  STAFF
 }
 
-enum TournamentFormat {
-  ROUND_ROBIN
-  SINGLE_ELIMINATION
-}
-
-enum TournamentStatus {
+enum ProjectStatus {
   DRAFT
-  INSCRIPTIONS_OPEN
-  IN_PROGRESS
+  ACTIVE
+  PAUSED
   FINISHED
-  CANCELLED
+  ARCHIVED
 }
 
-enum MatchStatus {
-  PENDING
-  PLAYED
-  POSTPONED
-  BYE
+enum Visibility {
+  PUBLIC
+  PRIVATE
+}
+
+enum RecordStatus {
+  DRAFT
+  PENDING_REVIEW
+  PUBLISHED
+  REJECTED
+  ARCHIVED
+}
+
+enum RecordType {
+  ACTIVITY
+  EVIDENCE
+  PLANNING
+  REFLECTION
+  EVALUATION
+  OTHER
+}
+
+enum FileType {
+  IMAGE
+  VIDEO
+  AUDIO
+  PDF
+  DOCUMENT
+  OTHER
 }
 
 model User {
-  id            String   @id @default(uuid())
-  username      String   @unique @db.VarChar(100)
-  passwordHash  String   @map("password_hash") @db.VarChar(255)
-  role          Role     @default(TEAM)
-  teamId        String?  @unique @map("team_id")
-  isActive      Boolean  @default(true) @map("is_active")
-  createdAt     DateTime @default(now()) @map("created_at")
-  updatedAt     DateTime @updatedAt @map("updated_at")
+  id                 String    @id @default(uuid())
+  name               String    @db.VarChar(150)
+  email              String    @unique @db.VarChar(180)
+  passwordHash       String    @map("password_hash") @db.VarChar(255)
+  role               UserRole  @default(STAFF)
+  isActive           Boolean   @default(true) @map("is_active")
+  mustChangePassword Boolean   @default(false) @map("must_change_password")
+  createdAt          DateTime  @default(now()) @map("created_at")
+  updatedAt          DateTime  @updatedAt @map("updated_at")
+  deletedAt          DateTime? @map("deleted_at")
 
-  team           Team?          @relation(fields: [teamId], references: [id], onDelete: SetNull)
-  recordedResults MatchResult[] @relation("RecordedBy")
+  projectMemberships ProjectMember[]
+  createdRecords     ProjectRecord[] @relation("RecordAuthor")
+  reviewedRecords    ProjectRecord[] @relation("RecordReviewer")
+  uploadedFiles      RecordFile[]    @relation("FileUploader")
+  auditLogs          AuditLog[]
+  siteContentUpdates SiteContent[]   @relation("SiteContentUpdatedBy")
+  refreshSessions    RefreshSession[]
 
+  @@index([role])
+  @@index([isActive])
   @@map("users")
 }
 
-model Team {
-  id            String   @id @default(uuid())
-  name          String   @unique @db.VarChar(150)
-  shieldUrl     String?  @map("shield_url") @db.VarChar(500)
-  descriptionMd String?  @map("description_md") @db.Text
-  createdAt     DateTime @default(now()) @map("created_at")
-  updatedAt     DateTime @updatedAt @map("updated_at")
+model RefreshSession {
+  id        String    @id
+  userId    String    @map("user_id")
+  tokenHash String    @map("token_hash") @db.VarChar(64)
+  expiresAt DateTime  @map("expires_at")
+  revokedAt DateTime? @map("revoked_at")
+  createdAt DateTime  @default(now()) @map("created_at")
+  updatedAt DateTime  @updatedAt @map("updated_at")
 
-  user             User?
-  players          Player[]
-  tournamentTeams  TournamentTeam[]
-  homeMatches      Match[]    @relation("HomeTeam")
-  awayMatches      Match[]    @relation("AwayTeam")
-  standings        Standing[]
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
 
-  @@map("teams")
+  @@index([userId])
+  @@index([expiresAt])
+  @@map("refresh_sessions")
 }
 
-model Player {
+model SiteContent {
   id        String   @id @default(uuid())
-  teamId    String   @map("team_id")
-  firstName String   @map("first_name") @db.VarChar(100)
-  lastName  String   @map("last_name") @db.VarChar(100)
-  nickname  String?  @db.VarChar(100)
-  birthDate DateTime? @map("birth_date") @db.Date
-  isActive  Boolean  @default(true) @map("is_active")
+  key       String   @unique @db.VarChar(100)
+  title     String   @db.VarChar(200)
+  content   String   @db.Text
+  imageUrl  String?  @map("image_url") @db.VarChar(500)
+  updatedBy String?  @map("updated_by")
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  updatedByUser User? @relation("SiteContentUpdatedBy", fields: [updatedBy], references: [id], onDelete: SetNull)
+
+  @@map("site_contents")
+}
+
+model PedagogicalProject {
+  id                    String        @id @default(uuid())
+  name                  String        @db.VarChar(200)
+  slug                  String        @unique @db.VarChar(220)
+  description           String        @db.Text
+  curricularContents    String        @map("curricular_contents") @db.Text
+  methodology           String        @db.Text
+  duration              String        @db.VarChar(200)
+  pedagogicalFoundation String        @map("pedagogical_foundation") @db.Text
+  status                ProjectStatus @default(DRAFT)
+  visibility            Visibility    @default(PRIVATE)
+  coverImageUrl         String?       @map("cover_image_url") @db.VarChar(500)
+  displayOrder          Int           @default(0) @map("display_order")
+  categoryId            String?       @map("category_id")
+  createdAt             DateTime      @default(now()) @map("created_at")
+  updatedAt             DateTime      @updatedAt @map("updated_at")
+  deletedAt             DateTime?     @map("deleted_at")
+
+  category ProjectCategory? @relation(fields: [categoryId], references: [id], onDelete: SetNull)
+  members  ProjectMember[]
+  records  ProjectRecord[]
+
+  @@index([status])
+  @@index([visibility])
+  @@index([displayOrder])
+  @@index([categoryId])
+  @@map("pedagogical_projects")
+}
+
+model ProjectMember {
+  id            String   @id @default(uuid())
+  projectId     String   @map("project_id")
+  userId        String   @map("user_id")
+  roleInProject String?  @map("role_in_project") @db.VarChar(150)
+  createdAt     DateTime @default(now()) @map("created_at")
+
+  project PedagogicalProject @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  user    User               @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([projectId, userId])
+  @@index([userId])
+  @@map("project_members")
+}
+
+model ProjectRecord {
+  id            String       @id @default(uuid())
+  projectId     String       @map("project_id")
+  title         String       @db.VarChar(200)
+  description   String?      @db.Text
+  recordDate    DateTime     @map("record_date") @db.Date
+  type          RecordType
+  visibility    Visibility   @default(PRIVATE)
+  status        RecordStatus @default(PENDING_REVIEW)
+  createdBy     String       @map("created_by")
+  reviewedBy    String?      @map("reviewed_by")
+  reviewedAt    DateTime?    @map("reviewed_at")
+  reviewComment String?      @map("review_comment") @db.Text
+  createdAt     DateTime     @default(now()) @map("created_at")
+  updatedAt     DateTime     @updatedAt @map("updated_at")
+  deletedAt     DateTime?    @map("deleted_at")
+
+  project  PedagogicalProject @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  author   User               @relation("RecordAuthor", fields: [createdBy], references: [id], onDelete: Restrict)
+  reviewer User?              @relation("RecordReviewer", fields: [reviewedBy], references: [id], onDelete: SetNull)
+  files    RecordFile[]
+  tags     RecordTag[]
+
+  @@index([projectId])
+  @@index([createdBy])
+  @@index([reviewedBy])
+  @@index([visibility, status])
+  @@index([recordDate])
+  @@map("project_records")
+}
+
+model RecordFile {
+  id           String     @id @default(uuid())
+  recordId     String     @map("record_id")
+  fileName     String     @map("file_name") @db.VarChar(255)
+  originalName String     @map("original_name") @db.VarChar(255)
+  mimeType     String     @map("mime_type") @db.VarChar(150)
+  size         BigInt
+  storagePath  String     @map("storage_path") @db.VarChar(700)
+  publicUrl    String?    @map("public_url") @db.VarChar(700)
+  type         FileType
+  visibility   Visibility @default(PRIVATE)
+  uploadedBy   String     @map("uploaded_by")
+  createdAt    DateTime   @default(now()) @map("created_at")
+
+  record   ProjectRecord @relation(fields: [recordId], references: [id], onDelete: Cascade)
+  uploader User          @relation("FileUploader", fields: [uploadedBy], references: [id], onDelete: Restrict)
+
+  @@index([recordId])
+  @@index([uploadedBy])
+  @@index([visibility])
+  @@map("record_files")
+}
+
+model AuditLog {
+  id         String   @id @default(uuid())
+  userId     String?  @map("user_id")
+  action     String   @db.VarChar(120)
+  entityType String   @map("entity_type") @db.VarChar(120)
+  entityId   String?  @map("entity_id")
+  metadata   Json?
+  createdAt  DateTime @default(now()) @map("created_at")
+
+  user User? @relation(fields: [userId], references: [id], onDelete: SetNull)
+
+  @@index([userId])
+  @@index([entityType, entityId])
+  @@index([createdAt])
+  @@map("audit_logs")
+}
+
+model ProjectCategory {
+  id           String   @id @default(uuid())
+  name         String   @unique @db.VarChar(120)
+  slug         String   @unique @db.VarChar(140)
+  description  String?  @db.Text
+  displayOrder Int      @default(0) @map("display_order")
+  createdAt    DateTime @default(now()) @map("created_at")
+  updatedAt    DateTime @updatedAt @map("updated_at")
+
+  projects PedagogicalProject[]
+
+  @@index([displayOrder])
+  @@map("project_categories")
+}
+
+model Tag {
+  id        String   @id @default(uuid())
+  name      String   @unique @db.VarChar(80)
+  slug      String   @unique @db.VarChar(100)
   createdAt DateTime @default(now()) @map("created_at")
 
-  team Team @relation(fields: [teamId], references: [id], onDelete: Cascade)
+  records RecordTag[]
 
-  @@map("players")
+  @@map("tags")
 }
 
-model GameType {
-  id          String   @id @default(uuid())
-  name        String   @unique @db.VarChar(100)
-  icon        String   @default("🎮") @db.VarChar(10)
-  description String?  @db.Text
-  rulesMd     String?  @map("rules_md") @db.Text
-  isActive    Boolean  @default(true) @map("is_active")
-  createdAt   DateTime @default(now()) @map("created_at")
+model RecordTag {
+  id       String @id @default(uuid())
+  recordId String @map("record_id")
+  tagId    String @map("tag_id")
 
-  tournaments Tournament[]
+  record ProjectRecord @relation(fields: [recordId], references: [id], onDelete: Cascade)
+  tag    Tag           @relation(fields: [tagId], references: [id], onDelete: Cascade)
 
-  @@map("game_types")
-}
-
-model Tournament {
-  id                String           @id @default(uuid())
-  name              String           @db.VarChar(200)
-  gameTypeId        String           @map("game_type_id")
-  format            TournamentFormat
-  status            TournamentStatus @default(DRAFT)
-  roundRobinReturn  Boolean          @default(false) @map("round_robin_return")
-  tiebreakerCriteria Json?           @default("[\"points_diff\", \"wins\", \"points_for\"]") @map("tiebreaker_criteria")
-  pointsPerWin      Int              @default(3) @map("points_per_win")
-  pointsPerDraw     Int              @default(1) @map("points_per_draw")
-  pointsPerLoss     Int              @default(0) @map("points_per_loss")
-  startDate         DateTime?        @map("start_date") @db.Date
-  endDate           DateTime?        @map("end_date") @db.Date
-  description       String?          @db.Text
-  createdAt         DateTime         @default(now()) @map("created_at")
-  updatedAt         DateTime         @updatedAt @map("updated_at")
-
-  gameType        GameType         @relation(fields: [gameTypeId], references: [id])
-  tournamentTeams TournamentTeam[]
-  matches         Match[]
-  standings       Standing[]
-
-  @@map("tournaments")
-}
-
-model TournamentTeam {
-  id           String   @id @default(uuid())
-  tournamentId String   @map("tournament_id")
-  teamId       String   @map("team_id")
-  seed         Int?
-  enrolledAt   DateTime @default(now()) @map("enrolled_at")
-
-  tournament Tournament @relation(fields: [tournamentId], references: [id], onDelete: Cascade)
-  team       Team       @relation(fields: [teamId], references: [id], onDelete: Cascade)
-
-  @@unique([tournamentId, teamId])
-  @@map("tournament_teams")
-}
-
-model Match {
-  id              String      @id @default(uuid())
-  tournamentId    String      @map("tournament_id")
-  homeTeamId      String?     @map("home_team_id")
-  awayTeamId      String?     @map("away_team_id")
-  round           Int
-  matchOrder      Int         @default(0) @map("match_order")
-  status          MatchStatus @default(PENDING)
-  scheduledAt     DateTime?   @map("scheduled_at")
-  location        String?     @db.VarChar(200)
-  notes           String?     @db.Text
-  bracketPosition Int?        @map("bracket_position")
-  bracketRound    Int?        @map("bracket_round")
-  createdAt       DateTime    @default(now()) @map("created_at")
-  updatedAt       DateTime    @updatedAt @map("updated_at")
-
-  tournament Tournament   @relation(fields: [tournamentId], references: [id], onDelete: Cascade)
-  homeTeam   Team?        @relation("HomeTeam", fields: [homeTeamId], references: [id])
-  awayTeam   Team?        @relation("AwayTeam", fields: [awayTeamId], references: [id])
-  result     MatchResult?
-
-  @@index([tournamentId, round])
-  @@index([homeTeamId])
-  @@index([awayTeamId])
-  @@map("matches")
-}
-
-model MatchResult {
-  id         String   @id @default(uuid())
-  matchId    String   @unique @map("match_id")
-  homeScore  Int      @map("home_score")
-  awayScore  Int      @map("away_score")
-  extraData  Json?    @map("extra_data")
-  recordedBy String   @map("recorded_by")
-  recordedAt DateTime @default(now()) @map("recorded_at")
-
-  match    Match @relation(fields: [matchId], references: [id], onDelete: Cascade)
-  recorder User  @relation("RecordedBy", fields: [recordedBy], references: [id])
-
-  @@map("match_results")
-}
-
-model Standing {
-  id            String   @id @default(uuid())
-  tournamentId  String   @map("tournament_id")
-  teamId        String   @map("team_id")
-  played        Int      @default(0)
-  wins          Int      @default(0)
-  draws         Int      @default(0)
-  losses        Int      @default(0)
-  pointsFor     Int      @default(0) @map("points_for")
-  pointsAgainst Int      @default(0) @map("points_against")
-  pointsDiff    Int      @default(0) @map("points_diff")
-  totalPoints   Int      @default(0) @map("total_points")
-  position      Int      @default(0)
-  updatedAt     DateTime @updatedAt @map("updated_at")
-
-  tournament Tournament @relation(fields: [tournamentId], references: [id], onDelete: Cascade)
-  team       Team       @relation(fields: [teamId], references: [id], onDelete: Cascade)
-
-  @@unique([tournamentId, teamId])
-  @@map("standings")
+  @@unique([recordId, tagId])
+  @@index([tagId])
+  @@map("record_tags")
 }

@@ -330,6 +330,38 @@ h1, h2, h3, h4, h5, h6 {
   width: 100%;
 }
 
+.pagination-controls {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-md);
+  margin-top: var(--space-lg);
+  padding: var(--space-sm) 0;
+  color: var(--text-secondary);
+  font-size: var(--text-sm);
+}
+
+.pagination-buttons {
+  display: flex;
+  align-items: center;
+  gap: var(--space-sm);
+}
+
+.pagination-summary {
+  min-width: 0;
+}
+
+@media (max-width: 480px) {
+  .pagination-controls {
+    align-items: stretch;
+    flex-direction: column;
+  }
+
+  .pagination-buttons .btn {
+    flex: 1;
+  }
+}
+
 
 /* ═══════════════════════════════════════════════════════════════
    FORM SYSTEM
@@ -841,12 +873,12 @@ h1, h2, h3, h4, h5, h6 {
 /* ═══════════════════════════════════════════════════════════════
    SCORE DISPLAY
    ═══════════════════════════════════════════════════════════════ */
-.score-display {
+.metric-display {
   font-family: var(--font-mono);
   font-weight: 700;
   font-size: var(--text-xl);
 }
-.score-vs {
+.metric-separator {
   color: var(--text-muted);
   font-size: var(--text-xs);
   margin: 0 var(--space-sm);
@@ -854,9 +886,9 @@ h1, h2, h3, h4, h5, h6 {
 
 
 /* ═══════════════════════════════════════════════════════════════
-   TEAM SHIELD / AVATAR
+   GENERIC AVATAR
    ═══════════════════════════════════════════════════════════════ */
-.team-shield {
+.entity-avatar {
   width: 40px;
   height: 40px;
   border-radius: var(--radius-md);
@@ -864,7 +896,7 @@ h1, h2, h3, h4, h5, h6 {
   border: 2px solid var(--border-light);
 }
 
-.team-shield-placeholder {
+.entity-avatar-placeholder {
   width: 40px;
   height: 40px;
   border-radius: var(--radius-md);
@@ -879,7 +911,7 @@ h1, h2, h3, h4, h5, h6 {
   flex-shrink: 0;
 }
 
-.team-shield-lg {
+.entity-avatar-lg {
   width: 80px;
   height: 80px;
   font-size: var(--text-2xl);

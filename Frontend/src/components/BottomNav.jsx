@@ -1,21 +1,15 @@
-/**
- * BottomNav — Fixed bottom navigation for team dashboard (mobile only).
- * Shows 4 routes with active state based on current location.
- * Hidden on desktop via CSS.
- */
 import { NavLink } from 'react-router-dom';
 import './BottomNav.css';
 
 const navItems = [
-  { to: '/team', label: 'Inicio', icon: '🏠', end: true },
-  { to: '/team/standings', label: 'Posiciones', icon: '📊' },
-  { to: '/team/tournaments', label: 'Torneos', icon: '🏆' },
-  { to: '/team/profile', label: 'Perfil', icon: '👤' },
+  { to: '/staff', label: 'Inicio', icon: 'IN', end: true },
+  { to: '/staff/proyectos', label: 'Proyectos', icon: 'PR' },
+  { to: '/staff/registros', label: 'Registros', icon: 'RG' },
 ];
 
 export default function BottomNav() {
   return (
-    <nav className="bottom-nav" role="navigation" aria-label="Navegación principal del equipo">
+    <nav className="bottom-nav" role="navigation" aria-label="Navegacion del equipo pedagogico">
       {navItems.map((item) => (
         <NavLink
           key={item.to}

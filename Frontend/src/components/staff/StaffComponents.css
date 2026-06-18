@@ -1,0 +1,225 @@
+.staff-state {
+  padding: var(--space-xl);
+  background: var(--bg-card);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-md);
+  text-align: center;
+  color: var(--text-secondary);
+}
+
+.staff-state .spinner {
+  margin: 0 auto var(--space-md);
+}
+
+.staff-state h2 {
+  color: var(--text-primary);
+  margin-bottom: var(--space-sm);
+}
+
+.staff-state p + .btn,
+.staff-state-action {
+  margin-top: var(--space-md);
+}
+
+.staff-state-error {
+  border-color: rgba(239, 68, 68, 0.35);
+  background: rgba(239, 68, 68, 0.08);
+}
+
+.staff-state-empty {
+  background: rgba(148, 163, 184, 0.06);
+}
+
+.staff-project-card,
+.staff-record-card,
+.staff-uploader,
+.staff-file-item {
+  padding: var(--space-lg);
+  background: var(--bg-card);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-md);
+  box-shadow: var(--shadow-sm);
+}
+
+.staff-project-card,
+.staff-record-card {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-md);
+}
+
+.staff-record-card.compact {
+  padding: var(--space-md);
+}
+
+.staff-card-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: var(--space-md);
+  flex-wrap: wrap;
+}
+
+.staff-card-header h2 {
+  font-size: var(--text-lg);
+  margin-top: 0.15rem;
+}
+
+.staff-kicker {
+  color: var(--text-muted);
+  font-size: var(--text-xs);
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.staff-card-copy {
+  color: var(--text-secondary);
+}
+
+.staff-card-meta {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+  gap: var(--space-sm);
+}
+
+.staff-card-meta dt {
+  color: var(--text-muted);
+  font-size: var(--text-xs);
+  font-weight: 800;
+  text-transform: uppercase;
+}
+
+.staff-card-meta dd {
+  color: var(--text-primary);
+}
+
+.staff-card-actions,
+.staff-badge-row,
+.staff-file-actions {
+  display: flex;
+  gap: var(--space-sm);
+  flex-wrap: wrap;
+}
+
+.staff-badge {
+  display: inline-flex;
+  align-items: center;
+  min-height: 26px;
+  padding: 0.2rem 0.6rem;
+  border-radius: var(--radius-full);
+  font-size: var(--text-xs);
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  white-space: nowrap;
+}
+
+.staff-badge-success {
+  color: var(--accent-success);
+  background: rgba(16, 185, 129, 0.12);
+}
+
+.staff-badge-warning {
+  color: var(--accent-warning);
+  background: rgba(245, 158, 11, 0.14);
+}
+
+.staff-badge-danger {
+  color: var(--accent-danger);
+  background: rgba(239, 68, 68, 0.12);
+}
+
+.staff-badge-info {
+  color: var(--accent-cyan);
+  background: rgba(6, 182, 212, 0.12);
+}
+
+.staff-badge-muted {
+  color: var(--text-secondary);
+  background: rgba(148, 163, 184, 0.12);
+}
+
+.staff-uploader {
+  display: grid;
+  gap: var(--space-md);
+}
+
+.staff-uploader p,
+.staff-file-item p {
+  color: var(--text-secondary);
+}
+
+.staff-file-input {
+  min-height: 52px;
+  padding: 0.85rem;
+  border: 1px dashed var(--border-color);
+  border-radius: var(--radius-md);
+  background: rgba(255, 255, 255, 0.025);
+  color: var(--text-secondary);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+}
+
+.staff-file-input input {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  opacity: 0;
+  pointer-events: none;
+}
+
+.staff-progress {
+  height: 8px;
+  overflow: hidden;
+  border-radius: var(--radius-full);
+  background: var(--bg-input);
+}
+
+.staff-progress span {
+  display: block;
+  height: 100%;
+  background: var(--accent-primary);
+  transition: width var(--transition-fast);
+}
+
+.staff-feedback {
+  padding: 0.75rem var(--space-md);
+  border-radius: var(--radius-md);
+  border: 1px solid var(--border-color);
+  color: var(--text-secondary);
+}
+
+.staff-feedback.success {
+  color: var(--accent-success);
+  border-color: rgba(16, 185, 129, 0.35);
+  background: rgba(16, 185, 129, 0.08);
+}
+
+.staff-feedback.error {
+  color: var(--accent-danger);
+  border-color: rgba(239, 68, 68, 0.35);
+  background: rgba(239, 68, 68, 0.08);
+}
+
+.staff-file-list {
+  display: grid;
+  gap: var(--space-md);
+}
+
+.staff-file-list.empty {
+  padding: var(--space-md);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-md);
+  color: var(--text-secondary);
+  background: rgba(148, 163, 184, 0.06);
+}
+
+.staff-file-item {
+  display: flex;
+  justify-content: space-between;
+  gap: var(--space-md);
+  align-items: flex-start;
+  flex-wrap: wrap;
+}

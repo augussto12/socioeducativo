@@ -1,7 +1,7 @@
-const { CORS_ORIGIN } = require('./env');
+const { CORS_ORIGIN, splitList } = require('./env');
 
 // Support comma-separated origins (e.g. "http://localhost:5173,http://localhost:5174")
-const allowedOrigins = CORS_ORIGIN.split(',').map(o => o.trim());
+const allowedOrigins = splitList(CORS_ORIGIN);
 
 const corsOptions = {
   origin: (origin, callback) => {
