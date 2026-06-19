@@ -60,7 +60,7 @@ GitHub solo necesita secretos para entrar por SSH a la VPS:
 ```bash
 VPS_HOST=31.97.241.220
 VPS_USER=USUARIO_SSH
-VPS_PRIVATE_KEY=CLAVE_PRIVADA_OPENSSH
+VPS_PASSWORD=PASSWORD_DEL_USUARIO_SSH
 VPS_PORT=22
 ```
 
@@ -77,6 +77,8 @@ GitHub > Settings > Environments > production > Environment secrets
 ```
 
 No cargar `DB_PASSWORD`, `JWT_ACCESS_SECRET`, `JWT_REFRESH_SECRET` ni `ADMIN_PASSWORD` como GitHub secrets para este deploy. Esas variables viven en `/home/socioeducativo/.env`.
+
+Nota: este workflow esta configurado para autenticar por password porque el repositorio ya tiene `VPS_PASSWORD` cargado. Si mas adelante se quiere usar clave privada SSH, cambiar `password` por `key` en `.github/workflows/deploy.yml` y crear el secret `VPS_PRIVATE_KEY`.
 
 ## Crear El .env En La VPS
 
