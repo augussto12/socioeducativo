@@ -63,7 +63,7 @@ VPS_USER=USUARIO_SSH
 VPS_PASSWORD=PASSWORD_DEL_USUARIO_SSH
 VPS_PORT=22
 ```
-
+        
 Se cargan en:           
 
 ```text
