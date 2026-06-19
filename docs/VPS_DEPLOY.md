@@ -64,7 +64,7 @@ VPS_PASSWORD=PASSWORD_DEL_USUARIO_SSH
 VPS_PORT=22
 ```
 
-Se cargan en:
+Se cargan en:           
 
 ```text
 GitHub > Settings > Secrets and variables > Actions
